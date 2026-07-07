@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroNews from '../components/HeroNews.astro';
+import BreakingTicker from '../components/BreakingTicker.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import PopularList from '../components/PopularList.astro';
+import CategoryNav from '../components/CategoryNav.astro';
+import AiDailyBrief from '../components/AiDailyBrief.astro';
+import {
+  getPublishedPosts,
+  getTrendingPosts,
+  getPopularPosts,
+  getPostsByCategory,
+  getPostsForSection,
+  postSlug,
+} from '../lib/posts';
+
+const allPosts = await getPublishedPosts();
+const fallbackFeatured = allPosts.find((p) => p.data.featured) ?? allPosts[0];
+const featured = getPostsForSection(
+  allPosts,
+  'home-hero',
+  1,
+  fallbackFeatured ? [fallbackFeatured] : [],
+)[0];
+
+const featuredSlug = featured ? postSlug(featured) : '';
+const postsWithoutFeatured = allPosts.filter((p) => postSlug(p) !== featuredSlug);
+const heroSide = getPostsForSection(postsWithoutFeatured, 'home-side', 3, postsWithoutFeatured);
+
+const breaking = getPostsForSection(allPosts, 'breaking-news', 5, allPosts);
+
+const usedInHero = new Set([featuredSlug, ...heroSide.map(postSlug)]);
+const fallbackLatest = allPosts.filter((p) => !usedInHero.has(postSlug(p)));
+const latest = getPostsForSection(allPosts, 'latest-news', 6, fallbackLatest);
+
+const fallbackTrending = await getTrendingPosts(4);
+const trending = getPostsForSection(allPosts, 'tech-trends', 4, fallbackTrending);
+
+const fallbackPopular = await getPopularPosts(5);
+const popular = getPostsForSection(allPosts, 'popular-sidebar', 5, fallbackPopular);
+
+const fallbackAiBrief = (await getPostsByCategory('ai')).slice(0, 3);
+const aiBrief = getPostsForSection(allPosts, 'ai-daily-brief', 3, fallbackAiBrief);
+---
+
+<BaseLayout title="Tin tức công nghệ và AI" appendSiteName={false}>
+  <div class="container">
+    {featured && <HeroNews post={featured} side={heroSide} />}
+    <div class="ticker-wrap">
+      <BreakingTicker posts={breaking} />
+    </div>
+    <div class="cat-row">
+      <CategoryNav />
+    </div>
+  </div>
+
+  <div class="container layout-main">
+    <div class="main-col">
+      <section class="section" aria-label="Cập nhật mới nhất">
+        <div class="section-head">
+          <h2 class="section-title">Cập nhật mới nhất</h2>
+          <a href="/search" class="section-link">Xem tất cả →</a>
+        </div>
+        <div class="grid grid-3">
+          {latest.map((p) => <ArticleCard post={p} headingLevel={3} />)}
+        </div>
+      </section>
+    </div>
+
+    <aside class="sidebar" aria-label="Nội dung phụ">
+      <PopularList posts={popular} title="Đọc nhiều" />
+    </aside>
+  </div>
+
+  <div class="container">
+    <AiDailyBrief posts={aiBrief} />
+
+    {trending.length > 0 && (
+      <section class="section trend-section" aria-label="Xu hướng công nghệ">
+        <div class="section-head trend-head">
+          <h2 class="section-title">Xu hướng công nghệ</h2>
+          <span class="section-rule" aria-hidden="true"></span>
+        </div>
+        <div class="grid grid-4">
+          {trending.map((p) => <ArticleCard post={p} headingLevel={3} />)}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .ticker-wrap {
+    margin-top: 24px;
+  }
+  .cat-row {
+    margin-top: 24px;
+  }
+  .main-col {
+    min-width: 0;
+  }
+  .sidebar {
+    display: grid;
+    gap: 24px;
+    position: sticky;
+    top: 84px;
+  }
+  .trend-head {
+    align-items: center;
+  }
+  .section-rule {
+    height: 1px;
+    flex: 1;
+    background: var(--border);
+  }
+
+  @media (max-width: 960px) {
+    .sidebar {
+      position: static;
+    }
+  }
+</style>

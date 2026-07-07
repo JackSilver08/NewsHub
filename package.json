@@ -1,0 +1,22 @@
+{
+  "name": "newshub",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "NewsHub - static tech/AI news portal built with Astro + Decap CMS",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "cms": "npx decap-server"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.0.6"
+  },
+  "devDependencies": {
+    "decap-server": "^3.1.4"
+  }
+}

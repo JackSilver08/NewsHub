@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python bulk.py)",
+      "Bash(python check.py)",
+      "Bash(PYTHONIOENCODING=utf-8 python -c ' *)",
+      "Bash(ls \"/c/Program Files/Google/Chrome/Application/chrome.exe\" \"/c/Program Files \\(x86\\)/Google/Chrome/Application/chrome.exe\" \"/c/Program Files \\(x86\\)/Microsoft/Edge/Application/msedge.exe\" 2>/dev/null | head)",
+      "Read(//c/Program Files/Google/Chrome/Application/**)",
+      "Bash(python -c ' *)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1440,8200 --virtual-time-budget=9000 --screenshot=\"shot3.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=0.62 --window-size=1440,9800 --virtual-time-budget=9000 --screenshot=\"shot3.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1400,9000 --screenshot=\"shot3.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1400,9200 --virtual-time-budget=9000 --screenshot=\"foot.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=0.5 --window-size=1400,9400 --virtual-time-budget=9000 --screenshot=\"fpg.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "PowerShell(Get-Process chrome -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Force)",
+      "PowerShell(\"cleared\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=1400,8000 --virtual-time-budget=9000 --screenshot=\"p8.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --no-pdf-header-footer --virtual-time-budget=9000 --print-to-pdf=\"page.pdf\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --user-data-dir=\"./cprofile\" --no-pdf-header-footer --virtual-time-budget=9000 --print-to-pdf=\"page.pdf\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(rm -rf cprofile2)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --user-data-dir=\"./cprofile2\" --window-size=1400,7900 --virtual-time-budget=8000 --screenshot=\"low.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(rm -rf mprofile)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --user-data-dir=\"./mprofile\" --window-size=390,2600 --virtual-time-budget=8000 --screenshot=\"mob.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Bash(rm -rf mprofile cprofile cprofile2)",
+      "Bash(\"/c/Program Files/Google/Chrome/Application/chrome.exe\" --headless=new --disable-gpu --hide-scrollbars --window-size=390,2400 --virtual-time-budget=8000 --screenshot=\"mob.png\" \"file:///c:/NewsHub/Echo News.html\")",
+      "Read(//c/Users/tuant/AppData/Local/Temp/**)",
+      "Bash(curl -s \"https://html.themewant.com/echo/assets/css/style.css\" -o \"C:/Users/tuant/AppData/Local/Temp/nh_style.css\")",
+      "Bash(sed -n '11960,11990p' \"C:/Users/tuant/AppData/Local/Temp/nh_style.css\")"
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleCard from '../../components/ArticleCard.astro';
+import CategoryNav from '../../components/CategoryNav.astro';
+import { CATEGORIES } from '../../lib/categories';
+import { getPostsByCategory } from '../../lib/posts';
+
+export const getStaticPaths = (async () => {
+  return CATEGORIES.map((cat) => ({
+    params: { slug: cat.slug },
+    props: { category: cat },
+  }));
+}) satisfies GetStaticPaths;
+
+const { category } = Astro.props;
+const posts = await getPostsByCategory(category.slug);
+---
+
+<BaseLayout
+  title={`${category.label} — Tin công nghệ`}
+  description={category.description}
+>
+  <div class="container cat-page">
+    <header class="cat-header">
+      <p class="cat-kicker">Chuyên mục</p>
+      <h1>{category.label}</h1>
+      <p class="cat-desc">{category.description}</p>
+    </header>
+
+    <div class="cat-row">
+      <CategoryNav active={category.slug} />
+    </div>
+
+    {posts.length > 0 ? (
+      <div class="grid grid-3 cat-grid">
+        {posts.map((p) => <ArticleCard post={p} headingLevel={2} />)}
+      </div>
+    ) : (
+      <p class="empty">Chưa có bài viết trong chuyên mục này.</p>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .cat-page {
+    padding-top: 32px;
+  }
+  .cat-header {
+    margin-bottom: 8px;
+  }
+  .cat-kicker {
+    color: var(--nh-purple);
+    font-family: var(--font-head);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+    margin: 0 0 6px;
+  }
+  .cat-header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    margin: 0 0 8px;
+  }
+  .cat-desc {
+    color: var(--text-soft);
+    max-width: 60ch;
+    margin: 0;
+  }
+  .cat-row {
+    margin: 22px 0 26px;
+  }
+  .cat-grid {
+    padding-bottom: 24px;
+  }
+  .empty {
+    padding: 40px 0;
+    color: var(--text-muted);
+  }
+</style>

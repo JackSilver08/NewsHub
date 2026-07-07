@@ -1,0 +1,125 @@
+---
+import type { Post } from '../lib/posts';
+import { postSlug } from '../lib/posts';
+
+export interface Props {
+  posts: Post[];
+}
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <div class="ticker" role="region" aria-label="Tin nóng mới nhất">
+    <span class="ticker-label">Tin nóng</span>
+    <div class="ticker-viewport">
+      <ul class="ticker-track">
+        {posts.map((p) => (
+          <li><a href={`/article/${postSlug(p)}`}>{p.data.title}</a></li>
+        ))}
+        {/* duplicate for seamless loop */}
+        {posts.map((p) => (
+          <li aria-hidden="true"><a href={`/article/${postSlug(p)}`} tabindex="-1">{p.data.title}</a></li>
+        ))}
+      </ul>
+    </div>
+  </div>
+)}
+
+<style>
+  .ticker {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    background: var(--nh-dark);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 0;
+    box-shadow: none;
+    min-height: 48px;
+  }
+  .ticker-label {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #fff;
+    background: var(--nh-purple);
+  }
+  .ticker-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    margin-right: 8px;
+    border-radius: 999px;
+    background: #fff;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .ticker-viewport {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+    min-width: 0;
+  }
+  .ticker-track {
+    list-style: none;
+    display: flex;
+    width: max-content;
+    min-width: max-content;
+    gap: 40px;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    animation: ticker-scroll 22s linear infinite;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  .ticker-track::-webkit-scrollbar,
+  .ticker-viewport::-webkit-scrollbar {
+    display: none;
+  }
+  .ticker-viewport:hover .ticker-track {
+    animation-play-state: paused;
+  }
+  .ticker-track li {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    padding-block: 13px;
+  }
+  .ticker-track a {
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 0.9rem;
+    font-weight: 650;
+  }
+  .ticker-track a::before {
+    content: '›';
+    color: #c0c1ff;
+    margin-right: 8px;
+    font-weight: 700;
+  }
+  .ticker-track a:hover {
+    color: #c0c1ff;
+  }
+  @keyframes ticker-scroll {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+  }
+</style>

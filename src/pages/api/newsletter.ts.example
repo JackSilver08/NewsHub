@@ -1,0 +1,47 @@
+// ────────────────────────────────────────────────────────────────────────────
+// Serverless-ready placeholder for a future POST /api/newsletter endpoint.
+//
+// NewsHub v1 is a fully static site (`output: 'static'`), so this file is kept
+// as `.example` and is NOT built. When you want a real API route:
+//
+//   1. Install the Vercel adapter:
+//        npm i @astrojs/vercel
+//   2. Enable on-demand rendering in astro.config.mjs:
+//        import vercel from '@astrojs/vercel/serverless';
+//        export default defineConfig({
+//          output: 'server',            // or 'hybrid'
+//          adapter: vercel(),
+//          integrations: [sitemap()],
+//        });
+//   3. Rename this file to `newsletter.ts` and add `export const prerender = false`.
+//
+// The handler below shows the intended shape.
+// ────────────────────────────────────────────────────────────────────────────
+
+import type { APIRoute } from 'astro';
+
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request }) => {
+  try {
+    const { email } = await request.json();
+    if (typeof email !== 'string' || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return new Response(JSON.stringify({ ok: false, error: 'Email không hợp lệ' }), {
+        status: 400,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+
+    // TODO: forward `email` to your provider (Resend, Mailchimp, a KV store, ...).
+
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  } catch {
+    return new Response(JSON.stringify({ ok: false, error: 'Yêu cầu không hợp lệ' }), {
+      status: 400,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+};

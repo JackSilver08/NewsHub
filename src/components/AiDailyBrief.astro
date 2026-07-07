@@ -1,0 +1,169 @@
+---
+import type { Post } from '../lib/posts';
+import { postSlug } from '../lib/posts';
+
+export interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 && (
+  <section class="brief" aria-label="AI Daily Brief">
+    <div class="brief-bg">
+      <div class="brief-head">
+        <div>
+          <span class="brief-kicker"><span></span>AI Daily Brief</span>
+          <h2>Tổng hợp AI trong ngày</h2>
+          <p>
+            Những chuyển động đáng chú ý nhất về mô hình, hạ tầng và ứng dụng AI,
+            được chắt lọc để đọc nhanh nhưng vẫn có ngữ cảnh.
+          </p>
+        </div>
+        <a href="/category/ai" class="brief-link">Xem thêm tin AI →</a>
+      </div>
+
+      <div class="brief-grid">
+        <article class="brief-card">
+          <div class="brief-icon">60</div>
+          <h3>Tóm tắt 60 giây</h3>
+          <p>{posts[0]?.data.excerpt}</p>
+          {posts[0] && <a href={`/article/${postSlug(posts[0])}`}>{posts[0].data.title}</a>}
+        </article>
+        <article class="brief-card">
+          <div class="brief-icon">AI</div>
+          <h3>Góc nhìn chuyên sâu</h3>
+          <p>
+            Đặt tin tức vào bối cảnh tác động đến doanh nghiệp, developer và người dùng cuối.
+          </p>
+          {posts[1] && <a href={`/article/${postSlug(posts[1])}`}>{posts[1].data.title}</a>}
+        </article>
+        <article class="brief-card">
+          <div class="brief-icon">↗</div>
+          <h3>Theo dõi xu hướng</h3>
+          <p>
+            Theo dõi các chủ đề nóng như AI agent, chip AI, dữ liệu cá nhân và tự động hóa.
+          </p>
+          {posts[2] && <a href={`/article/${postSlug(posts[2])}`}>{posts[2].data.title}</a>}
+        </article>
+      </div>
+    </div>
+  </section>
+)}
+
+<style>
+  .brief {
+    padding: 32px 0 40px;
+  }
+  .brief-bg {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    padding: clamp(28px, 5vw, 56px);
+    color: #fff;
+    background:
+      radial-gradient(circle at 90% 0%, rgba(70, 72, 212, 0.13), transparent 42%),
+      #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-hover);
+  }
+  .brief-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 26px;
+  }
+  .brief-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #c0c1ff;
+    font-family: var(--font-head);
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .brief-kicker span {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--nh-purple);
+    box-shadow: 0 0 0 5px rgba(70, 72, 212, 0.18);
+  }
+  .brief-head h2 {
+    color: #fff;
+    font-size: clamp(1.8rem, 3vw, 2.55rem);
+    margin: 12px 0 8px;
+  }
+  .brief-head p {
+    max-width: 680px;
+    margin: 0;
+    color: #cbd5e1;
+  }
+  .brief-link {
+    flex: 0 0 auto;
+    color: #fff;
+    font-weight: 800;
+  }
+  .brief-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .brief-card {
+    min-height: 100%;
+    padding: 22px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(7px);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .brief-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .brief-icon {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    border-radius: 12px;
+    background: var(--nh-purple);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 900;
+  }
+  .brief-card h3 {
+    color: #fff;
+    font-size: 1.08rem;
+    margin-bottom: 8px;
+  }
+  .brief-card p {
+    color: #cbd5e1;
+    font-size: 0.93rem;
+    line-height: 1.68;
+  }
+  .brief-card a {
+    color: #6ffbbe;
+    font-family: var(--font-head);
+    font-size: 0.9rem;
+    font-weight: 800;
+  }
+
+  @media (max-width: 820px) {
+    .brief-head {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .brief-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

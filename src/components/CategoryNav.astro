@@ -1,0 +1,68 @@
+---
+import { CATEGORIES } from '../lib/categories';
+
+export interface Props {
+  /** Currently active category slug, if any. */
+  active?: string;
+  /** Include an "All" pill linking to the homepage. */
+  showAll?: boolean;
+}
+const { active, showAll = true } = Astro.props;
+---
+
+<nav class="cat-nav" aria-label="Lọc theo chuyên mục">
+  <ul>
+    {showAll && (
+      <li>
+        <a href="/" class={!active ? 'active' : ''}>Tất cả</a>
+      </li>
+    )}
+    {CATEGORIES.map((cat) => (
+      <li>
+        <a href={`/category/${cat.slug}`} class={active === cat.slug ? 'active' : ''}>
+          {cat.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .cat-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .cat-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .cat-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 4px 0;
+    white-space: nowrap;
+  }
+  .cat-nav a {
+    display: inline-block;
+    padding: 9px 22px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text-soft);
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.82rem;
+    transition: all 0.15s ease;
+  }
+  .cat-nav a:hover {
+    border-color: var(--nh-purple);
+    color: var(--nh-purple);
+  }
+  .cat-nav a.active {
+    background: var(--nh-grad);
+    border-color: transparent;
+    color: #fff;
+  }
+</style>

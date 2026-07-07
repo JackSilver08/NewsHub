@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>NewsHub — Công nghệ &amp; Tương lai</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#fffbff",
+                        "primary-fixed-dim": "#bec6e0",
+                        "surface": "#f7f9fb",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed": "#131b2e",
+                        "on-secondary-fixed": "#07006c",
+                        "on-tertiary-container": "#009668",
+                        "on-surface": "#191c1e",
+                        "outline-variant": "#c6c6cd",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed-dim": "#4edea3",
+                        "error-container": "#ffdad6",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#e1e0ff",
+                        "surface-container-low": "#f2f4f6",
+                        "on-error": "#ffffff",
+                        "secondary": "#4648d4",
+                        "on-tertiary-fixed": "#002113",
+                        "tertiary-fixed": "#6ffbbe",
+                        "surface-container": "#eceef0",
+                        "on-surface-variant": "#45464d",
+                        "on-tertiary-fixed-variant": "#005236",
+                        "on-background": "#191c1e",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#c0c1ff",
+                        "background": "#f7f9fb",
+                        "on-primary-container": "#7c839b",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-primary": "#bec6e0",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary-fixed-variant": "#2f2ebe",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#131b2e",
+                        "surface-tint": "#565e74",
+                        "outline": "#76777d",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#002113",
+                        "tertiary": "#000000",
+                        "surface-container-high": "#e6e8ea",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "primary-fixed": "#dae2fd",
+                        "secondary-container": "#6063ee",
+                        "surface-variant": "#e0e3e5",
+                        "primary": "#000000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "base": "8px",
+                        "container-max": "1280px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "section-gap": "80px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "caption": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Be Vietnam Pro"],
+                        "headline-lg-mobile": ["Be Vietnam Pro"],
+                        "display-xl": ["Be Vietnam Pro"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "caption": ["12px", { "lineHeight": "1.4", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-md": ["20px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.7", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "display-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #F8FAFC;
+        }
+        .hero-gradient {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.8) 100%);
+        }
+        .sidebar-list-item:not(:last-child) {
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .bento-card-shadow {
+            box-shadow: 0px 4px 20px rgba(15, 23, 42, 0.05);
+        }
+        .bento-card-shadow:hover {
+            box-shadow: 0px 10px 30px rgba(15, 23, 42, 0.08);
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-primary-container border-b border-outline-variant dark:border-on-primary-fixed-variant docked full-width top-0 sticky z-50 shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center w-full px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-gutter">
+<a class="text-headline-md font-headline-md font-extrabold text-primary dark:text-primary-fixed" href="#">NewsHub</a>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-secondary dark:text-secondary-fixed-dim font-bold border-b-2 border-secondary text-label-md font-label-md py-1" href="#">Trang chủ</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">AI</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">Thiết bị</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">Startup</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">An ninh mạng</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">Lập trình</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">Cloud</a>
+<a class="text-on-surface-variant dark:text-on-primary-fixed-variant hover:text-primary transition-colors text-label-md font-label-md hover:text-secondary dark:hover:text-secondary-fixed" href="#">Đánh giá</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<input class="bg-surface-container border-none rounded-full px-5 py-2 text-sm w-64 focus:ring-2 focus:ring-secondary/50" placeholder="Tìm bài viết, chủ đề..." type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-2 text-outline" data-icon="search">search</span>
+</div>
+<div class="flex gap-2">
+<button class="px-4 py-2 text-label-md font-bold text-on-surface border border-outline rounded-lg hover:bg-surface-container transition-all">Đăng nhập</button>
+<button class="px-4 py-2 text-label-md font-bold bg-primary text-on-primary rounded-lg hover:opacity-90 active:scale-95 transition-all">Đăng ký</button>
+</div>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop">
+<!-- Hero Section -->
+<section class="mt-8 grid grid-cols-12 gap-gutter">
+<!-- Main Hero -->
+<div class="col-span-12 lg:col-span-8 relative h-[500px] rounded-xl overflow-hidden group cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A sophisticated digital rendering of a futuristic AI brain network illuminated by neon blue and white light filaments. The environment is dark and technical, suggesting high-performance computing. Large, bold white typography is overlaid, and the overall mood is authoritative and innovative, characteristic of a premium tech news platform." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvUu-OZtkbTpH16MqjaBDNzTaywAMwoKPDHhiJFVLkdH9AUnw-6vPV4QSRJyGsfvTkgT5prRkut_ZkMt9uV1Y9ZBYU0OSOZ2ujJLyqxe67vSDpGNjpIQEsplR2MxdiW8kaq8UALWyq8eWpNe6R03VnaQf869UFTrRij9bAQeZx7nWKSDX3YteueWML-5v1_mCmYQLQy4Kt7CSlnWEb_mFW48V7TxvAz7m16sbGRrnDy6xOr-TBhc4fyIWozGDaw-y7fFY4TT__zUs')">
+</div>
+<div class="absolute inset-0 hero-gradient"></div>
+<div class="absolute bottom-0 left-0 p-8 text-white max-w-2xl">
+<span class="inline-block px-3 py-1 bg-secondary text-[10px] font-bold tracking-widest rounded-full mb-4 uppercase">Tin nổi bật</span>
+<h1 class="text-display-xl font-display-xl mb-4 leading-tight">Mô hình AI thế hệ mới đẩy khả năng suy luận lên tầm cao mới</h1>
+<p class="text-body-lg font-body-lg opacity-90 mb-6 line-clamp-2">Thế hệ mô hình ngôn ngữ mới nhất tập trung vào suy luận nhiều bước, giảm ảo giác và mở ra cách con người làm việc cùng trợ lý AI trong công việc hằng ngày.</p>
+<div class="flex items-center gap-4 text-caption font-caption opacity-80">
+<span>Ngọc Anh</span>
+<span>•</span>
+<span>07/07/2026</span>
+<span>•</span>
+<span>6 phút đọc</span>
+</div>
+</div>
+</div>
+<!-- Hero Side Sidebar -->
+<div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
+<!-- Side Item 1 -->
+<div class="flex gap-4 p-3 rounded-xl hover:bg-white transition-colors cursor-pointer group">
+<div class="w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-110" data-alt="A minimalist close-up of a futuristic robotic hand interacting with a floating holographic user interface, representing an AI agent. The lighting is soft and corporate, dominated by deep blues and whites. The visual style is clean and high-fidelity, typical of modern software technology aesthetics." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb4cikZs89ON2RaEaAHHEv9rnk0qpCXDN8j05gBoTWQSsElzB2ejhAGUyHNSVj_6HVScfxdKRtw_6PHZIxDgiAm6KU4dkg4nBnuUGBEJOpVDeYiNy0Qr5AFrGXojFOWmoQtw1WnXuf_gLPcd6pJ-q9YqtMF_6lDmI3PgIpTvKAEv1P5JUDjFQPRN5dDqBwax936GLBA1c1HHayoLd0kGqCM1URmgpbdwrhxoYNxwYwADzmWLZWG0MDLWFS79SMsLYe71-wJY4XG_s"/>
+</div>
+<div>
+<span class="text-secondary font-bold text-[10px] uppercase">AI</span>
+<h3 class="font-headline-md text-headline-md leading-snug mt-1 line-clamp-2 group-hover:text-secondary transition-colors">AI agent: khi trợ lý biết tự lên kế hoạch và hành động</h3>
+</div>
+</div>
+<!-- Side Item 2 -->
+<div class="flex gap-4 p-3 rounded-xl hover:bg-white transition-colors cursor-pointer group">
+<div class="w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-110" data-alt="Microscopic view of advanced semiconductor chip circuitry glowing with golden and electric blue data pathways. The image is crisp and detailed, showcasing the complexity of hardware components for AI processing. The atmosphere is professional and highlights cutting-edge technological progress." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_a0DutV3VuFEe66-8Y_MoU7_2K0UUxXkH8J4o3gi-eV-E7hKoqRVI7b6GfujYwdwDyzrClbd4baPtg1Y_xq9VXQ1GQzsF5A3tkylChMtxpzl1GQ_rhveIiI_u4_6A0QuY396jeuS9d7evxyZUborIQQy2uYGwAk2IEIHJhHa6OASeWOvRfAvx5kZCiW2HKbYdqVkBvSssf5teYmbqv8SZhtRRnJQE7sq3302ZJfA0ny2SdLokFDNtPsXb3o8hdXb8shUeA_4r5mA"/>
+</div>
+<div>
+<span class="text-secondary font-bold text-[10px] uppercase">AI</span>
+<h3 class="font-headline-md text-headline-md leading-snug mt-1 line-clamp-2 group-hover:text-secondary transition-colors">Cuộc đua chip AI: khi phần cứng quyết định tốc độ đổi mới</h3>
+</div>
+</div>
+<!-- Side Item 3 -->
+<div class="flex gap-4 p-3 rounded-xl hover:bg-white transition-colors cursor-pointer group">
+<div class="w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+<img class="w-full h-full object-cover transition-transform group-hover:scale-110" data-alt="A smart agricultural drone flying over a vast, lush green farm during a bright morning. The scene represents modern smart farming and agritech. The lighting is natural and high-key, creating an accessible yet sophisticated mood that blends nature with high technology." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4DxiZVg3w0dNlo_UHHvEMRxpMEUymxrmTc6g5r02gpaFrqNihns4NfwqSnRYKoSlqwdqNGKXhzz_uHSV_8sTc3xCpnK_rR6WJ9bAVvX7nRHS8LAabmsmmbP7cLQK-ECKJazYVS2pauD7wz-zB9gSoMaY0Y99wqmMAA50652r2HvmsKBm1YI6OrfUysbVC7XDi869eICcxZJ3aLKONcoR_tRU8eKgN54tM_61NGgeKhDIJUIiNHPA2DLSAkj8YEhk0oSuRcKLekCw"/>
+</div>
+<div>
+<span class="text-secondary font-bold text-[10px] uppercase">Startup</span>
+<h3 class="font-headline-md text-headline-md leading-snug mt-1 line-clamp-2 group-hover:text-secondary transition-colors">Startup Việt ứng dụng AI vào nông nghiệp thông minh</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Trending Bar -->
+<div class="mt-8 bg-primary-container text-on-primary rounded-xl overflow-hidden flex items-center h-12">
+<div class="bg-secondary px-6 h-full flex items-center font-bold text-label-md whitespace-nowrap">
+<span class="material-symbols-outlined mr-2 text-sm" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+                TIN NÓNG
+            </div>
+<div class="flex-1 overflow-hidden relative">
+<div class="flex items-center gap-12 animate-marquee whitespace-nowrap px-8 text-label-md opacity-90">
+<a class="hover:text-secondary-fixed transition-colors" href="#">Mô hình AI thế hệ mới đẩy khả năng suy luận lên tầm cao mới</a>
+<a class="hover:text-secondary-fixed transition-colors" href="#">AI agent: khi trợ lý biết tự lên kế hoạch và hành động</a>
+<a class="hover:text-secondary-fixed transition-colors" href="#">Cuộc đua chip AI: khi phần cứng quyết định tốc độ đổi mới</a>
+<a class="hover:text-secondary-fixed transition-colors" href="#">Apple Intelligence cập nhật tính năng mới tại Việt Nam</a>
+</div>
+</div>
+</div>
+<style>
+            @keyframes marquee {
+                0% { transform: translateX(0); }
+                100% { transform: translateX(-50%); }
+            }
+            .animate-marquee {
+                display: flex;
+                width: max-content;
+                animation: marquee 30s linear infinite;
+            }
+        </style>
+<!-- Category Pills -->
+<div class="mt-gutter flex flex-wrap gap-3">
+<button class="px-6 py-2 bg-secondary text-white rounded-full font-bold text-label-md">Tất cả</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">AI</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">Thiết bị</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">Startup</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">An ninh mạng</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">Lập trình</button>
+<button class="px-6 py-2 bg-white text-on-surface-variant border border-outline-variant hover:border-secondary hover:text-secondary rounded-full font-bold text-label-md transition-all">Cloud</button>
+</div>
+<!-- Main Content Area -->
+<section class="mt-gutter grid grid-cols-12 gap-gutter">
+<!-- News Grid -->
+<div class="col-span-12 lg:col-span-9">
+<div class="flex justify-between items-end mb-6">
+<h2 class="text-headline-lg font-headline-lg border-l-4 border-secondary pl-4">Cập nhật mới nhất</h2>
+<a class="text-label-md font-bold text-secondary flex items-center hover:underline" href="#">
+                        Xem tất cả <span class="material-symbols-outlined ml-1" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Post 1 -->
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A sleek, ultra-thin premium laptop resting on a minimalist marble desk with soft ambient lighting. The screen shows a vibrant code editor. The background is a clean, modern home office setting. The visual tone is high-end, elegant, and professional, targeting tech enthusiasts." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpAidoqOhyWsuak4pd0h9pa2bXV6wkCnPNJIdl--Dwokxg7EP00OHHEiOpUETOzNUQrVV7bDHN9hn8FAAIiP76tneDCZ1CuXvQEcC7pBAUAYWM7lFvmeTkJaizaBrh3GlGV9Z3XAG20nzQ1h-dNumR7_1IEH9c_D2yYDWErvzjcnxEUlAvkw6GnEjFwu-sbLKmwIKjk7HW1igm4qruvPYftzkyX5r_MsarmL_2I0YajhhWfvRYCHvZbiKqn3TnjtKha8Gw_bpmVrE"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary/20 backdrop-blur-md text-primary px-3 py-1 rounded text-[10px] font-bold uppercase">Đánh giá</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">Đánh giá laptop AI 2026: nhẹ hơn, thông minh hơn, pin bền hơn</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Thế hệ laptop tích hợp bộ xử lý thần kinh mang lại trải nghiệm làm việc mượt mà, thời lượng pin kéo dài ấn tượng...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Gia Bảo • 04/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 6 phút</span>
+</div>
+</div>
+</article>
+<!-- Post 2 -->
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A dramatic digital visualization of a cyber security shield protecting a network grid from a cascade of red malicious code particles. The aesthetic is tech-noir with high-contrast neon accents of blue and red. The mood is urgent yet secure, representing enterprise-level threat protection." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-9xwSUaBWm6Zt59fuiBFtbsjKf2uMKLZzPdJq1c1U_E4COa18-S5xPccAr9LbMxSKEaU9smUmMChp4w9W6_iMlawVTPSZVGXhTaF_Z7Y7FghUdD7whyAQA6yXOUQtlZkyCVzRlFQgFkN-3nPwZYjPvyHg8C_RdrL5T6TZLa3u5IezOxV9E597c09HI47n46ZPFPdqdeRY886QY331L0u6VftiJ419GzI8mpYoyOa2N_CBrUIqhauppQjJmu-AyqF4c07vYeUTUcE"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded text-[10px] font-bold uppercase">An ninh mạng</span>
+<span class="bg-orange-100 text-orange-600 px-3 py-1 rounded text-[10px] font-bold uppercase">Xu hướng</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">Phòng thủ trước mã độc tống tiền: bài học cho doanh nghiệp Việt</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Các cuộc tấn công mã độc tống tiền ngày càng tinh vi với quy mô rộng khắp, đòi hỏi một chiến lược bảo mật đa lớp...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Đức Toàn • 04/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 8 phút</span>
+</div>
+</div>
+</article>
+<!-- Post 3 -->
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A stylized 3D character made of colorful blocks and data symbols looking at a privacy lock icon. The lighting is soft and playful yet maintains a clean corporate aesthetic. The image represents data privacy and ownership in a digital world, using a minimalist and modern design language." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAk6naJTaUVjDD7pB3XciU8aBkTCuzSSlYldInlqI6Xi8PnrXaIFP4d8YD2_PJ-VPltJbijsz01ZRwUZkkOp6QDMnTrXMgBLKuh7jP0MddqprlgW0TGM7MYe9sUKp3v-c36tt-LGIO-4xWOmeTURdHJF4dEiwbSjPjW0g3zadI97LevWn1DlAdPVAP6phN_tHlzY5-9lXYLV_ejvuhbdQ2BCQuevp-jGdx-kzRoNQ4E3_HslLplx5FrwrE1t7wwBe7LwzMF6KHr_kM"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded text-[10px] font-bold uppercase">AI</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">Quyền riêng tư dữ liệu: người dùng cần biết gì trong kỷ nguyên AI</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Khi AI học từ dữ liệu cá nhân, làm thế nào để đảm bảo tính minh bạch và bảo mật thông tin người dùng cuối...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Lan Phương • 03/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 5 phút</span>
+</div>
+</div>
+</article>
+<!-- Row 2 -->
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="An abstract visualization of TypeScript code symbols swirling into a glowing core. The palette uses deep blues and vibrant purples. The style is modern and technical, suggesting power and flexibility in programming. Lighting is focused and sharp, creating a sophisticated feel for developers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrfOMKYvBanFYl7LqNf88ba418YY0Thzt3P6AooW3l4AW_u1xb21SLcJiZRNSCy5lVaTqm4Ck90OtpsfLxJQbNcFP93kGom6Ru2JUKBWoSQCFTpKAJOklGM2y-NGwP4XIBj8fF0Z0p62w7VGFkr1lZSQyZh8sx5xxCG3ktN7SqFQlF23LhOeYQiWGWK5xPLxvcpXUomCIYaqQR0j1gjo6ai6XaE05UzNmqAJkrmn-qIGr6HVWHEv9VrKz32wKRzf4KUKWXqiS2BHU"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded text-[10px] font-bold uppercase">Lập trình</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">Vì sao TypeScript tiếp tục thống trị lựa chọn của lập trình viên</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Từ dự án nhỏ đến hệ thống lớn, TypeScript ngày càng chứng tỏ được ưu thế vượt trội về hiệu năng và bảo trì...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Hoàng Nam • 03/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 7 phút</span>
+</div>
+</div>
+</article>
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A creative professional wearing a high-tech AR headset, manipulating vibrant digital art assets in mid-air. The background is a minimalist studio. The lighting is ethereal and cool-toned, showcasing the intersection of human creativity and generative AI technology. Professional and visionary mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpqFYexGpgcgb-izFGYDgGnulaZSTKV5_acX4WsAvaeUXHVDcuw1n3jSpT7fd5tH-hygLn6GIzMQ7GAMbssapoyfxYesZr6n9MDh6dctVssKCq6nrf_zu9bhRbsBjOJ_s2DDPlp0XRyjySlyQZliYwVSNqs2fc5uXwH1-EOe0qHy4ws7dtKqQexCP-8iQSB9uQHbMdBPNHFKh_tx6BphbAs5UlCzgCKbN93u5H_B2Rh5oYce7U6Un_uFUO7Zh8SVEwDoIH0s2rPsc"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-secondary/10 text-secondary px-3 py-1 rounded text-[10px] font-bold uppercase">AI</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">AI tạo sinh thay đổi cách làm việc sáng tạo như thế nào</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Sự trỗi dậy của các mô hình đa phương thức đang định hình lại quy trình làm việc của designer và biên kịch...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Ngọc Anh • 02/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 4 phút</span>
+</div>
+</div>
+</article>
+<article class="bg-white rounded-xl overflow-hidden bento-card-shadow transition-all group flex flex-col h-full">
+<div class="aspect-video relative overflow-hidden">
+<img class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="A massive, high-tech server farm with thousands of glowing blue LED lights reflecting on a polished floor. The perspective is long and symmetrical, emphasizing scale and power. The color palette is dominated by dark grays and bright tech-blues, representing the backbone of modern cloud computing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7qhxbz5igYj3D_H2gtuOS_2c31bLahELh0aqni6xpsIVSnX9cswROT9hfIwqcWV31RQNBHqZvuMUUS1_nvnTkwVcIA1PXD3TI_F13ld90MNlQ4Dt9tpmmVzaL6Hca2HP3wez7snm7TPFaKrkv2b60OChlzxnpIRyDvZR9bGTixCBC3fCtcpqiOlnxSa3X3sGNsY7w0OMNKekwLPXNPez3SqvsNE9wObQI9fUs6GEmOdIxeb3uz0skryvcMsmT3Hf9QwCJYnR7kVc"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-primary/20 text-primary px-3 py-1 rounded text-[10px] font-bold uppercase">Cloud</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-grow">
+<h3 class="font-headline-md text-headline-md mb-3 group-hover:text-secondary transition-colors">Cloud và cuộc đua hạ tầng số cho thời đại AI</h3>
+<p class="text-body-md text-on-surface-variant line-clamp-3 mb-6">Nhu cầu tính toán khổng lồ cho AI đang định hình lại thị trường điện toán đám mây toàn cầu...</p>
+<div class="mt-auto flex items-center justify-between text-caption text-outline">
+<span>Trọng Nghĩa • 02/07</span>
+<span class="flex items-center"><span class="material-symbols-outlined text-sm mr-1" data-icon="schedule">schedule</span> 9 phút</span>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Sidebar -->
+<aside class="col-span-12 lg:col-span-3">
+<div class="bg-white rounded-xl p-6 bento-card-shadow h-fit sticky top-24">
+<h2 class="text-headline-md font-headline-md border-l-4 border-secondary pl-4 mb-6">Đọc nhiều</h2>
+<ul class="space-y-4">
+<li class="sidebar-list-item pb-4 group cursor-pointer">
+<div class="flex items-start gap-4">
+<span class="text-headline-lg font-headline-lg text-primary/10 group-hover:text-secondary/20 transition-colors">1</span>
+<div>
+<h4 class="font-bold text-on-surface leading-snug group-hover:text-secondary transition-colors">Mô hình AI thế hệ mới đẩy khả năng suy luận...</h4>
+<div class="flex items-center gap-2 text-[10px] text-outline font-bold mt-1 uppercase">
+<span class="text-secondary">AI</span>
+<span>•</span>
+<span>07/07/2026</span>
+</div>
+</div>
+</div>
+</li>
+<li class="sidebar-list-item pb-4 group cursor-pointer">
+<div class="flex items-start gap-4">
+<span class="text-headline-lg font-headline-lg text-primary/10 group-hover:text-secondary/20 transition-colors">2</span>
+<div>
+<h4 class="font-bold text-on-surface leading-snug group-hover:text-secondary transition-colors">AI agent: khi trợ lý biết tự lên kế hoạch và hành động</h4>
+<div class="flex items-center gap-2 text-[10px] text-outline font-bold mt-1 uppercase">
+<span class="text-secondary">AI</span>
+<span>•</span>
+<span>06/07/2026</span>
+</div>
+</div>
+</div>
+</li>
+<li class="sidebar-list-item pb-4 group cursor-pointer">
+<div class="flex items-start gap-4">
+<span class="text-headline-lg font-headline-lg text-primary/10 group-hover:text-secondary/20 transition-colors">3</span>
+<div>
+<h4 class="font-bold text-on-surface leading-snug group-hover:text-secondary transition-colors">Cuộc đua chip AI: khi phần cứng quyết định tốc độ...</h4>
+<div class="flex items-center gap-2 text-[10px] text-outline font-bold mt-1 uppercase">
+<span class="text-secondary">AI</span>
+<span>•</span>
+<span>05/07/2026</span>
+</div>
+</div>
+</div>
+</li>
+<li class="sidebar-list-item pb-4 group cursor-pointer">
+<div class="flex items-start gap-4">
+<span class="text-headline-lg font-headline-lg text-primary/10 group-hover:text-secondary/20 transition-colors">4</span>
+<div>
+<h4 class="font-bold text-on-surface leading-snug group-hover:text-secondary transition-colors">Phòng thủ trước mã độc tống tiền: bài học cho...</h4>
+<div class="flex items-center gap-2 text-[10px] text-outline font-bold mt-1 uppercase">
+<span class="text-secondary">Security</span>
+<span>•</span>
+<span>04/07/2026</span>
+</div>
+</div>
+</div>
+</li>
+<li class="sidebar-list-item group cursor-pointer">
+<div class="flex items-start gap-4">
+<span class="text-headline-lg font-headline-lg text-primary/10 group-hover:text-secondary/20 transition-colors">5</span>
+<div>
+<h4 class="font-bold text-on-surface leading-snug group-hover:text-secondary transition-colors">AI tạo sinh thay đổi cách làm việc sáng tạo...</h4>
+<div class="flex items-center gap-2 text-[10px] text-outline font-bold mt-1 uppercase">
+<span class="text-secondary">AI</span>
+<span>•</span>
+<span>02/07/2026</span>
+</div>
+</div>
+</div>
+</li>
+</ul>
+</div>
+</aside>
+</section>
+<!-- AI Daily Brief (Dark Section) -->
+<section class="mt-section-gap mb-section-gap">
+<div class="bg-[#0F172A] rounded-3xl p-10 relative overflow-hidden">
+<!-- Background Subtle Glow -->
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary opacity-10 rounded-full blur-[100px] -mr-64 -mt-64"></div>
+<div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between mb-12">
+<div>
+<div class="flex items-center gap-2 text-secondary font-bold text-label-md mb-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                            AI DAILY BRIEF
+                        </div>
+<h2 class="text-display-xl font-display-xl text-white">Tổng hợp AI trong ngày</h2>
+<p class="text-primary-fixed-dim max-w-xl mt-4">Những chuyển động đáng chú ý nhất về mô hình, hạ tầng và ứng dụng AI, được chắt lọc để đọc nhanh nhưng vẫn có ngữ cảnh.</p>
+</div>
+<a class="mt-6 md:mt-0 text-white font-bold flex items-center group" href="#">
+                        Xem thêm tin AI <span class="material-symbols-outlined ml-2 group-hover:translate-x-2 transition-transform" data-icon="arrow_right_alt">arrow_right_alt</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Summary Card 1 -->
+<div class="bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mb-6 text-white font-bold text-lg">60</div>
+<h4 class="text-white font-bold text-xl mb-4">Tóm tắt 60 giây</h4>
+<p class="text-primary-fixed-dim text-body-md mb-6 leading-relaxed">Thế hệ mô hình ngôn ngữ mới nhất tập trung vào suy luận nhiều bước, giảm ảo giác và mở ra cách con người làm việc...</p>
+<a class="text-secondary font-bold text-label-md hover:underline underline-offset-4" href="#">Đọc bản tin nhanh</a>
+</div>
+<!-- Summary Card 2 -->
+<div class="bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-tertiary-fixed-dim flex items-center justify-center mb-6 text-on-tertiary-fixed font-bold text-lg">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+</div>
+<h4 class="text-white font-bold text-xl mb-4">Góc nhìn chuyên sâu</h4>
+<p class="text-primary-fixed-dim text-body-md mb-6 leading-relaxed">Đặt tin tức vào bối cảnh tác động đến doanh nghiệp, developer và người dùng cuối. AI agent: khi trợ lý biết tự lên kế hoạch...</p>
+<a class="text-tertiary-fixed-dim font-bold text-label-md hover:underline underline-offset-4" href="#">Xem phân tích</a>
+</div>
+<!-- Summary Card 3 -->
+<div class="bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10 hover:bg-white/10 transition-colors">
+<div class="w-12 h-12 rounded-xl bg-on-tertiary-container flex items-center justify-center mb-6 text-white font-bold text-lg">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+</div>
+<h4 class="text-white font-bold text-xl mb-4">Theo dõi xu hướng</h4>
+<p class="text-primary-fixed-dim text-body-md mb-6 leading-relaxed">Theo dõi các chủ đề nóng như AI agent, chip AI, dữ liệu cá nhân và tự động hóa. Cuộc đua chip AI: khi phần cứng quyết định...</p>
+<a class="text-on-tertiary-container font-bold text-label-md hover:underline underline-offset-4" href="#">Bản đồ xu hướng</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Tech Trends -->
+<section class="mb-section-gap">
+<div class="flex items-center gap-4 mb-8">
+<h2 class="text-headline-lg font-headline-lg shrink-0">Xu hướng công nghệ</h2>
+<div class="h-[1px] bg-outline-variant w-full"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Trend Card 1 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/3] rounded-xl overflow-hidden mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A futuristic interface showing glowing AI network nodes connecting in a 3D space. The aesthetic is extremely detailed and technical, featuring primary blue and white highlights. This represents the next generation of AI reasoning models in a modern, professional light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYQXEuwTDD-gauC2ET3-iAPA9RlJ5B5ZZoKdYxF22ahfUeTaw__X9zXMn9tWllRyjbeXuHj67W2ykh2z5diijfNJKTzXI196nVg-oUNlode5bmSUmj4rN6F_n2ORcB2f55UxaWlBhlE8r63JI9f9TIfbNf8M2zpFSL7TAznxGJsYZtvSW_bWJniJh_3V9O8ncVXxTn47xL4uLpeV7RYTURS24LVF3CjotAloMUYd6ekAypLyklf9IO78XtX8WhG52C6KTDsnt8AiU"/>
+</div>
+<div class="flex gap-2 mb-2">
+<span class="text-[10px] font-bold text-secondary uppercase">AI</span>
+<span class="text-[10px] font-bold text-orange-500 uppercase">Xu hướng</span>
+</div>
+<h3 class="font-bold text-lg leading-tight group-hover:text-secondary transition-colors">Mô hình AI thế hệ mới đẩy khả năng suy luận...</h3>
+<div class="mt-2 text-caption text-outline">07/07/2026 • 6 phút</div>
+</div>
+<!-- Trend Card 2 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/3] rounded-xl overflow-hidden mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A macro photography shot of an AI chip with intricate circuits glowing with electric blue and orange light. The focus is sharp on the center, while the edges fade into a soft professional blur. The image conveys a sense of high-performance and future-proof hardware innovation." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaH7o6hLpZpcFyicHnXiVEXgocozO0V-a-0m8WsixwFooxUiRybZVYUlfJmn3z5pinO25jXK7PHEXMsLISJCXwBYrsKwoGmsRVWJkaQBqY9EouxEs8IuAVVYTGYKKCxRB35jscNGUmI_haxHGV0DQzbRF6h2cc70OeQeU9OXPTCXdV2vMBEKmXjnZdyCpss5Lk-pRGxV9Ti71BBGKWPb1ExHjTJwr5YV-NGG-RE6C9usT3n20MZmOYQc7Ff6MfAvmidAInotqL5vU"/>
+</div>
+<div class="flex gap-2 mb-2">
+<span class="text-[10px] font-bold text-secondary uppercase">AI</span>
+<span class="text-[10px] font-bold text-orange-500 uppercase">Xu hướng</span>
+</div>
+<h3 class="font-bold text-lg leading-tight group-hover:text-secondary transition-colors">AI agent: khi trợ lý biết tự lên kế hoạch...</h3>
+<div class="mt-2 text-caption text-outline">06/07/2026 • 5 phút</div>
+</div>
+<!-- Trend Card 3 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/3] rounded-xl overflow-hidden mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A close-up side profile of a digital human head with golden data streams flowing through its brain, representing advanced machine learning. The style is clean, sleek, and high-fidelity, typical of premium technology branding. Lighting is soft and focuses on the intersection of human form and digital data." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDnZqLMdANJsMy6W3GUr7RLHCaG7lEFTRJTZgs9H7cCv7NWJwLLoqAEGGEmAytEez_dUdS0XjV-dEkAx9Og2Aju0d3oDd46W8vxBEjGvYtZul9QoWNDO89e2kHgArX2FOL_Bit_UJQSiW_BHlqeM-Lgi6jOSmO6ngaMMLmKHtOebsIFiPFFJJroKs0tKrtNVPHY1HYHWuDiAkZkLHWeaP9rX44J9WmXteAnopjlEXUyQcN8693sVg8UNIGJFEpW37mdB-f1IgNieQ"/>
+</div>
+<div class="flex gap-2 mb-2">
+<span class="text-[10px] font-bold text-secondary uppercase">AI</span>
+<span class="text-[10px] font-bold text-orange-500 uppercase">Xu hướng</span>
+</div>
+<h3 class="font-bold text-lg leading-tight group-hover:text-secondary transition-colors">Cuộc đua chip AI: khi phần cứng quyết định...</h3>
+<div class="mt-2 text-caption text-outline">05/07/2026 • 8 phút</div>
+</div>
+<!-- Trend Card 4 -->
+<div class="group cursor-pointer">
+<div class="aspect-[4/3] rounded-xl overflow-hidden mb-4">
+<img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" data-alt="A conceptual image of a futuristic eye reflecting a bright digital city grid, representing the constant flow of information and security. The lighting is sophisticated, using a mix of deep blues and vibrant yellow data particles. The overall mood is vigilant and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCL69lUr_E6zdalPStqDZDoz8StQN1G4A1vTm4gPU7tN1pvdhFIhNn71QSeNdX8AlT2isoTGzv2GRj_PoNbvitsb2kJ2bhjZ-QWVuENPzJEZGDR41eJiHhqKhKtuaWDEoJ3KNjuK4PmjkMeLKI71hG-03gLfE4iK-GsXKKYm-5VfaDN5E2ZTKkHWv3Iufbe3lc79XamPY2FKAJd6l--zRZcU0OVQ1VN3-N0ZMyycqF_mfrzv1f4bc5xOmS9wuKZNH9zVmDGXifln18"/>
+</div>
+<div class="flex gap-2 mb-2">
+<span class="text-[10px] font-bold text-secondary uppercase">An ninh</span>
+<span class="text-[10px] font-bold text-orange-500 uppercase">Xu hướng</span>
+</div>
+<h3 class="font-bold text-lg leading-tight group-hover:text-secondary transition-colors">Phòng thủ trước mã độc tống tiền: bài học...</h3>
+<div class="mt-2 text-caption text-outline">04/07/2026 • 7 phút</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-primary-container dark:bg-surface-container-lowest text-on-primary-fixed dark:text-primary">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter px-margin-desktop py-section-gap max-w-container-max mx-auto">
+<div class="col-span-1 md:col-span-1">
+<a class="text-headline-lg font-headline-lg text-on-secondary-container dark:text-primary mb-6 block" href="#">NewsHub</a>
+<p class="text-body-md text-on-primary-container leading-relaxed">Tin tức công nghệ, AI, startup và an ninh mạng — cập nhật nhanh, chọn lọc và dễ đọc cho người Việt hiện đại.</p>
+<div class="flex gap-4 mt-8">
+<a class="w-10 h-10 rounded-full border border-on-primary-container flex items-center justify-center hover:bg-secondary hover:border-secondary transition-colors group" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="facebook">face_nod</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-on-primary-container flex items-center justify-center hover:bg-secondary hover:border-secondary transition-colors group" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="rss_feed">rss_feed</span>
+</a>
+<a class="w-10 h-10 rounded-full border border-on-primary-container flex items-center justify-center hover:bg-secondary hover:border-secondary transition-colors group" href="#">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-bold text-on-secondary-container mb-6 text-label-md uppercase tracking-wider">Chuyên mục</h4>
+<ul class="space-y-4">
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">AI</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Thiết bị</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Startup</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">An ninh mạng</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Lập trình</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Cloud</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Đánh giá</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-on-secondary-container mb-6 text-label-md uppercase tracking-wider">NewsHub</h4>
+<ul class="space-y-4">
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block font-bold" href="#">Trang chủ</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Tìm kiếm</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">RSS</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Quản trị nội dung</a></li>
+<li><a class="text-on-primary-container hover:text-on-secondary-container hover:translate-x-1 transition-all inline-block" href="#">Về chúng tôi</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-on-secondary-container mb-6 text-label-md uppercase tracking-wider">Bản tin định kỳ</h4>
+<p class="text-on-primary-container text-body-md mb-6">Nhận tóm tắt tin tức công nghệ hàng đầu trực tiếp vào email của bạn mỗi sáng.</p>
+<form class="flex gap-2">
+<input class="bg-white/5 border border-white/10 rounded-lg px-4 py-2 flex-grow text-white focus:ring-2 focus:ring-secondary/50 outline-none" placeholder="Email của bạn" type="email"/>
+<button class="bg-secondary text-white font-bold px-4 py-2 rounded-lg hover:opacity-90">Gửi</button>
+</form>
+</div>
+</div>
+<div class="border-t border-white/5 py-8 px-margin-desktop text-center">
+<p class="text-caption text-on-primary-container opacity-60">© 2026 NewsHub. Dự án minh họa — nội dung mang tính tham khảo.</p>
+</div>
+</footer>
+<script>
+        // Micro-interaction for hover states
+        document.querySelectorAll('article, .sidebar-list-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'translateY(-4px)';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,160 @@
+---
+import type { Post } from '../lib/posts';
+import { postSlug, formatDate } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
+
+export interface Props {
+  post: Post;
+  /** Heading level for the card title (semantics). Default h3. */
+  headingLevel?: 2 | 3;
+  /** Compact horizontal layout (used in lists). */
+  horizontal?: boolean;
+}
+
+const { post, headingLevel = 3, horizontal = false } = Astro.props;
+const { data } = post;
+const slug = postSlug(post);
+const url = `/article/${slug}`;
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<article class={`card ${horizontal ? 'card-horizontal' : ''}`}>
+  <a href={url} class="card-media" aria-hidden="true" tabindex="-1">
+    {data.image ? (
+      <img src={data.image} alt={data.imageAlt || ''} loading="lazy" />
+    ) : (
+      <span class="card-media-fallback">{categoryLabel(data.category)}</span>
+    )}
+  </a>
+  <div class="card-body">
+    <div class="card-meta-top">
+      <a href={`/category/${data.category}`} class="chip">{categoryLabel(data.category)}</a>
+      {data.trending && <span class="dot-trend">Xu hướng</span>}
+    </div>
+    <Heading class="card-title">
+      <a href={url}>{data.title}</a>
+    </Heading>
+    {!horizontal && <p class="card-excerpt">{data.excerpt}</p>}
+    <p class="card-meta">
+      <span>{data.author}</span>
+      <span aria-hidden="true">•</span>
+      <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt)}</time>
+      {data.readingTime && (
+        <>
+          <span aria-hidden="true">•</span>
+          <span>{data.readingTime} phút đọc</span>
+        </>
+      )}
+    </p>
+  </div>
+</article>
+
+<style>
+  .card {
+    background: var(--surface);
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow);
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    height: 100%;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+  }
+  .card-media {
+    display: block;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.16), rgba(139, 92, 246, 0.18));
+    overflow: hidden;
+  }
+  .card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .card:hover .card-media img {
+    transform: scale(1.04);
+  }
+  .card-media-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-family: var(--font-head);
+    font-weight: 700;
+    color: var(--nh-purple);
+  }
+  .card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .card-meta-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dot-trend {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--nh-orange);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .card-title {
+    font-size: 1.05rem;
+    line-height: 1.36;
+    margin: 0;
+    /* clamp to keep text inside the card */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-title a:hover {
+    color: var(--nh-purple);
+  }
+  .card-excerpt {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .card-meta {
+    margin: auto 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+  }
+
+  /* horizontal variant (lists) */
+  .card-horizontal {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .card-horizontal .card-media {
+    flex: 0 0 110px;
+    aspect-ratio: 1 / 1;
+  }
+  .card-horizontal .card-title {
+    font-size: 0.98rem;
+    -webkit-line-clamp: 2;
+  }
+  .card-horizontal .card-body {
+    padding: 12px 14px;
+  }
+</style>

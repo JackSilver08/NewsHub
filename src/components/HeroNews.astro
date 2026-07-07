@@ -1,0 +1,248 @@
+---
+import type { Post } from '../lib/posts';
+import { postSlug, formatDate } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
+
+export interface Props {
+  post: Post;
+  /** Secondary posts shown in the side column of the hero. */
+  side?: Post[];
+}
+
+const { post, side = [] } = Astro.props;
+const { data } = post;
+const url = `/article/${postSlug(post)}`;
+---
+
+<section class="hero" aria-label="Tin nổi bật">
+  <a href={url} class="hero-main">
+    <div class="hero-media">
+      {data.image && <img src={data.image} alt={data.imageAlt || ''} fetchpriority="high" />}
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tags">
+        <span class="chip chip-solid">{categoryLabel(data.category)}</span>
+        <span class="hero-badge">Tin nổi bật</span>
+      </div>
+      <h1 class="hero-title">{data.title}</h1>
+      <p class="hero-excerpt">{data.excerpt}</p>
+      <p class="hero-meta">
+        {data.author} • <time datetime={data.publishedAt.toISOString()}>{formatDate(data.publishedAt)}</time>
+        {data.readingTime && <> • {data.readingTime} phút đọc</>}
+      </p>
+    </div>
+  </a>
+
+  {side.length > 0 && (
+    <div class="hero-side">
+      <h2 class="hero-side-heading">Nổi bật</h2>
+      <div class="hero-side-list">
+        {side.map((p) => (
+          <a href={`/article/${postSlug(p)}`} class="hero-side-item">
+            <div class="hero-side-media">
+              {p.data.image && <img src={p.data.image} alt={p.data.imageAlt || ''} loading="lazy" />}
+            </div>
+            <div class="hero-side-body">
+              <h3 class="hero-side-title">{p.data.title}</h3>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    gap: 24px;
+    padding-block: 32px 0;
+  }
+  .hero-main {
+    position: relative;
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 500px;
+    background: var(--nh-dark);
+    border: 0;
+    box-shadow: var(--shadow);
+  }
+  .hero-media,
+  .hero-media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(15, 23, 42, 0) 0%,
+      rgba(15, 23, 42, 0.35) 45%,
+      rgba(15, 23, 42, 0.84) 100%
+    );
+  }
+  .hero-content {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 32px;
+    color: #fff;
+  }
+  .hero-tags {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .hero-badge {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #c0c1ff;
+  }
+  .hero-title {
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.1;
+    margin: 0 0 14px;
+    max-width: 18ch;
+    font-weight: 800;
+  }
+  .hero-excerpt {
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 64ch;
+    margin: 0 0 12px;
+    font-size: 1.02rem;
+    line-height: 1.72;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-meta {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    margin: 0;
+  }
+
+  .hero-side {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    align-self: start;
+    padding-top: 2px;
+  }
+  .hero-side-heading {
+    position: relative;
+    color: var(--text);
+    font-size: 1.45rem;
+    line-height: 1.15;
+    margin: 0 0 6px;
+    padding-left: 14px;
+    font-weight: 800;
+  }
+  .hero-side-heading::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.16em;
+    bottom: 0.16em;
+    width: 4px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, var(--nh-purple), var(--nh-cyan));
+  }
+  .hero-side-list {
+    display: grid;
+    gap: 12px;
+  }
+  .hero-side-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: transparent;
+    border: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    padding: 8px;
+    transition: background 0.18s ease;
+  }
+  .hero-side-item:hover {
+    background: #fff;
+  }
+  .hero-side-media {
+    flex: 0 0 128px;
+    height: 96px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface-container);
+  }
+  .hero-side-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .hero-side-body {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+  .hero-side-title {
+    color: var(--text);
+    font-size: 1.15rem;
+    line-height: 1.3;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-side-item:hover .hero-side-title {
+    color: var(--nh-purple);
+  }
+
+  @media (max-width: 900px) {
+    .hero {
+      grid-template-columns: 1fr;
+    }
+    .hero-main {
+      min-height: 420px;
+    }
+    .hero-side {
+      padding-top: 0;
+    }
+  }
+  @media (max-width: 480px) {
+    .hero {
+      padding-block: 24px 16px;
+    }
+    .hero-content {
+      padding: 18px;
+    }
+    .hero-main {
+      min-height: 380px;
+    }
+    .hero-title {
+      font-size: clamp(1.9rem, 11vw, 2.65rem);
+    }
+    .hero-side-item {
+      flex-direction: column;
+    }
+    .hero-side-media {
+      flex-basis: auto;
+      min-height: 170px;
+    }
+    .hero-side-body {
+      padding: 16px;
+    }
+  }
+</style>

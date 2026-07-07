@@ -1,0 +1,107 @@
+---
+import type { Post } from '../lib/posts';
+import { postSlug, formatDate } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
+
+export interface Props {
+  posts: Post[];
+  title?: string;
+}
+const { posts, title = 'Đọc nhiều' } = Astro.props;
+---
+
+<section class="popular" aria-label={title}>
+  <h2 class="popular-title">{title}</h2>
+  <ol class="popular-list">
+    {posts.map((p, i) => (
+      <li class="popular-item">
+        <span class="popular-rank">{i + 1}</span>
+        <div class="popular-body">
+          <a href={`/article/${postSlug(p)}`} class="popular-link">{p.data.title}</a>
+          <p class="popular-meta">
+            <span class="popular-cat">{categoryLabel(p.data.category)}</span>
+            <span aria-hidden="true">•</span>
+            <time datetime={p.data.publishedAt.toISOString()}>{formatDate(p.data.publishedAt)}</time>
+          </p>
+        </div>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .popular {
+    background: var(--surface);
+    border: 0;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .popular-title {
+    font-size: 1rem;
+    margin: 0 0 14px;
+    padding-left: 12px;
+    position: relative;
+  }
+  .popular-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    bottom: 0.1em;
+    width: 4px;
+    border-radius: 4px;
+    background: var(--nh-purple);
+  }
+  .popular-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+  }
+  .popular-item {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .popular-item:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .popular-rank {
+    flex: 0 0 auto;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.3rem;
+    line-height: 1;
+    width: 1.6ch;
+    color: var(--nh-purple);
+  }
+  .popular-link {
+    font-family: var(--font-head);
+    font-weight: 600;
+    font-size: 0.88rem;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .popular-link:hover {
+    color: var(--nh-purple);
+  }
+  .popular-meta {
+    margin: 6px 0 0;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .popular-cat {
+    color: var(--nh-purple);
+    font-weight: 600;
+  }
+</style>

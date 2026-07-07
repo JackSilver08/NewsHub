@@ -1,0 +1,140 @@
+---
+import { CATEGORIES } from '../lib/categories';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="150" height="36" class="footer-logo" />
+      <p>
+        Tin tức công nghệ, AI, startup và an ninh mạng — cập nhật nhanh, chọn lọc và dễ đọc.
+      </p>
+    </div>
+
+    <nav class="footer-col" aria-label="Chuyên mục">
+      <h2>Chuyên mục</h2>
+      <ul>
+        {CATEGORIES.map((cat) => (
+          <li><a href={`/category/${cat.slug}`}>{cat.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="footer-col" aria-label="Liên kết">
+      <h2>NewsHub</h2>
+      <ul>
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/search">Tìm kiếm</a></li>
+        <li><a href="/rss.xml">RSS</a></li>
+        <li><a href="/admin/">Quản trị nội dung</a></li>
+        <li><a href="/">Về chúng tôi</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer-col footer-newsletter">
+      <h2>Bản tin định kỳ</h2>
+      <p>Nhận tóm tắt tin tức công nghệ hàng đầu trực tiếp vào email của bạn mỗi sáng.</p>
+      <form action="/search" method="get">
+        <label class="visually-hidden" for="footer-email">Email của bạn</label>
+        <input id="footer-email" name="q" type="email" placeholder="Email của bạn" />
+        <button type="submit">Gửi</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="container">
+      <p>© {year} NewsHub. Dự án minh hoạ — nội dung mang tính tham khảo.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--nh-dark);
+    color: #cbd5e1;
+    margin-top: 48px;
+  }
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.3fr;
+    gap: 32px;
+    padding-block: 48px 32px;
+  }
+  .footer-logo {
+    height: 34px;
+    width: auto;
+    margin-bottom: 14px;
+  }
+  .footer-brand p {
+    max-width: 42ch;
+    color: var(--nh-muted);
+    font-size: 0.95rem;
+  }
+  .footer-col h2 {
+    color: #fff;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 14px;
+  }
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .footer-col a {
+    color: #cbd5e1;
+    font-size: 0.92rem;
+  }
+  .footer-newsletter p {
+    color: var(--nh-muted);
+    font-size: 0.9rem;
+    margin-bottom: 14px;
+  }
+  .footer-newsletter form {
+    display: flex;
+    gap: 8px;
+  }
+  .footer-newsletter input {
+    min-width: 0;
+    flex: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    padding: 10px 12px;
+  }
+  .footer-newsletter button {
+    border: 0;
+    border-radius: 8px;
+    background: var(--nh-purple);
+    color: #fff;
+    font-weight: 800;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+  .footer-col a:hover {
+    color: var(--nh-cyan);
+  }
+  .footer-bottom {
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+    padding-block: 18px;
+  }
+  .footer-bottom p {
+    margin: 0;
+    color: var(--nh-muted);
+    font-size: 0.85rem;
+  }
+  @media (max-width: 700px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+    }
+    .footer-brand {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

@@ -1,0 +1,161 @@
+# Decap CMS configuration for NewsHub
+# Docs: https://decapcms.org/docs/
+
+backend:
+  name: github
+  # 👉 Change this to your GitHub "user/repo" after you push the project.
+  repo: your-username/newshub
+  branch: main
+  # A hosted OAuth client is required for the GitHub backend on Vercel.
+  # See README "Cấu hình Decap CMS" for the one-time setup.
+
+# Lets you run the CMS locally against the filesystem with:  npx decap-server
+# Start Astro (npm run dev) in one terminal and decap-server in another,
+# then open http://localhost:4321/admin/  — no GitHub auth needed locally.
+local_backend: true
+
+# Draft → review → publish workflow (creates PRs). Comment out for direct commits.
+publish_mode: editorial_workflow
+
+# Uploaded images go to public/uploads and are referenced as /uploads/...
+media_folder: "public/uploads"
+public_folder: "/uploads"
+
+# Vietnamese UI labels where useful
+locale: "vi"
+
+collections:
+  - name: "posts"
+    label: "Bài viết"
+    label_singular: "Bài viết"
+    folder: "src/content/posts"
+    create: true
+    delete: true
+    extension: "md"
+    format: "frontmatter"
+    # File name = the slug field, keeping it in sync with the URL.
+    slug: "{{fields.slug}}"
+    identifier_field: "title"
+    summary: "{{title}} — {{category}} ({{commit_date}})"
+    sortable_fields: ["publishedAt", "title", "popularScore", "sectionPriority"]
+    fields:
+      - { name: "title", label: "Tiêu đề", widget: "string" }
+      - {
+          name: "slug",
+          label: "Slug (đường dẫn)",
+          widget: "string",
+          hint: "Chữ thường, không dấu, dùng gạch ngang. Ví dụ: ai-agent-moi",
+          pattern: ["^[a-z0-9]+(?:-[a-z0-9]+)*$", "Chỉ dùng a-z, 0-9 và dấu gạch ngang"],
+        }
+      - {
+          name: "excerpt",
+          label: "Tóm tắt",
+          widget: "text",
+          hint: "1-2 câu mô tả, dùng cho thẻ tin và SEO.",
+        }
+      - {
+          name: "category",
+          label: "Chuyên mục",
+          widget: "select",
+          options:
+            [
+              { label: "AI", value: "ai" },
+              { label: "Thiết bị", value: "thiet-bi" },
+              { label: "Startup", value: "startup" },
+              { label: "An ninh mạng", value: "an-ninh-mang" },
+              { label: "Lập trình", value: "lap-trinh" },
+              { label: "Cloud", value: "cloud" },
+              { label: "Đánh giá", value: "danh-gia" },
+            ],
+        }
+      - {
+          name: "tags",
+          label: "Thẻ (tags)",
+          widget: "list",
+          default: [],
+          hint: "Nhấn Enter sau mỗi thẻ.",
+        }
+      - {
+          name: "author",
+          label: "Tác giả",
+          widget: "string",
+          default: "Ban Biên tập NewsHub",
+        }
+      - {
+          name: "publishedAt",
+          label: "Ngày đăng",
+          widget: "datetime",
+          date_format: "YYYY-MM-DD",
+          time_format: false,
+          format: "YYYY-MM-DD",
+        }
+      - {
+          name: "updatedAt",
+          label: "Ngày cập nhật",
+          widget: "datetime",
+          required: false,
+          date_format: "YYYY-MM-DD",
+          time_format: false,
+          format: "YYYY-MM-DD",
+        }
+      - {
+          name: "readingTime",
+          label: "Thời gian đọc (phút)",
+          widget: "number",
+          required: false,
+          value_type: "int",
+          min: 1,
+        }
+      - {
+          name: "image",
+          label: "Ảnh đại diện",
+          widget: "image",
+          required: false,
+          hint: "Ảnh sẽ được lưu vào /uploads.",
+        }
+      - {
+          name: "imageAlt",
+          label: "Mô tả ảnh (alt)",
+          widget: "string",
+          required: false,
+          default: "",
+        }
+      - { name: "featured", label: "Tin nổi bật (Hero)", widget: "boolean", default: false }
+      - { name: "trending", label: "Xu hướng", widget: "boolean", default: false }
+      - {
+          name: "sections",
+          label: "Khu vực hiển thị",
+          widget: "select",
+          multiple: true,
+          required: false,
+          default: [],
+          hint: "Chọn nơi bài này xuất hiện trên trang chủ. Nếu để trống, hệ thống sẽ tự dùng fallback theo ngày đăng/chuyên mục.",
+          options:
+            [
+              { label: "Trang chủ - Hero chính", value: "home-hero" },
+              { label: "Trang chủ - Cột tin bên phải hero", value: "home-side" },
+              { label: "Trang chủ - Tin nóng", value: "breaking-news" },
+              { label: "Trang chủ - Cập nhật mới nhất", value: "latest-news" },
+              { label: "Trang chủ - Đọc nhiều", value: "popular-sidebar" },
+              { label: "Trang chủ - AI Daily Brief", value: "ai-daily-brief" },
+              { label: "Trang chủ - Xu hướng công nghệ", value: "tech-trends" },
+            ],
+        }
+      - {
+          name: "sectionPriority",
+          label: "Ưu tiên trong khu vực",
+          widget: "number",
+          default: 0,
+          value_type: "int",
+          hint: "Số càng cao càng được xếp trước trong các khu vực đã chọn.",
+        }
+      - {
+          name: "popularScore",
+          label: "Điểm phổ biến",
+          widget: "number",
+          default: 0,
+          value_type: "int",
+          hint: "Số càng cao càng lên top 'Đọc nhiều'.",
+        }
+      - { name: "draft", label: "Bản nháp", widget: "boolean", default: false }
+      - { name: "body", label: "Nội dung", widget: "markdown" }

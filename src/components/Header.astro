@@ -1,0 +1,206 @@
+---
+import { CATEGORIES } from '../lib/categories';
+import SearchBox from './SearchBox.astro';
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <div class="header-left">
+      <a href="/" class="logo" aria-label="NewsHub - Trang chủ">
+        <img src="/assets/newshub-icon.png" alt="NewsHub" width="44" height="44" />
+      </a>
+
+      <div class="header-search">
+        <SearchBox variant="header" />
+      </div>
+    </div>
+
+    <div class="header-right">
+      <div class="auth-actions" aria-label="Tài khoản">
+        <a href="/admin/" class="auth-login">Đăng nhập</a>
+        <a href="/admin/" class="auth-signup">Đăng ký</a>
+      </div>
+      <button
+        class="nav-toggle"
+        aria-label="Mở menu"
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+      >
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- mobile drawer -->
+  <nav id="mobile-nav" class="mobile-nav" aria-label="Chuyên mục (di động)" hidden>
+    <ul>
+      <li><a href="/">Trang chủ</a></li>
+      {CATEGORIES.map((cat) => (
+        <li><a href={`/category/${cat.slug}`}>{cat.label}</a></li>
+      ))}
+      <li><a href="/search">Tìm kiếm</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 1px 10px rgba(15, 23, 42, 0.04);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 64px;
+    max-width: var(--maxw);
+    padding-inline: 40px;
+  }
+  .header-left {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .logo {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+  }
+  .logo img {
+    display: block;
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+  }
+  .header-search {
+    flex: 0 1 360px;
+    min-width: 220px;
+  }
+  .header-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .auth-actions {
+    display: flex;
+    gap: 8px;
+  }
+  .auth-actions a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 8px;
+    font-family: var(--font-head);
+    font-size: 0.8rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .auth-login {
+    border: 1px solid var(--border-strong);
+    background: #fff;
+    color: var(--text);
+  }
+  .auth-signup {
+    background: #000;
+    color: #fff;
+  }
+  .nav-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    background: var(--surface-container);
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .nav-toggle span {
+    display: block;
+    height: 2px;
+    width: 20px;
+    margin-inline: auto;
+    background: var(--text);
+    border-radius: 2px;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+  .nav-toggle[aria-expanded='true'] span:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+  .nav-toggle[aria-expanded='true'] span:nth-child(2) {
+    opacity: 0;
+  }
+  .nav-toggle[aria-expanded='true'] span:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+
+  .mobile-nav {
+    border-top: 1px solid var(--border);
+    background: #fff;
+  }
+  .mobile-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 8px 16px 16px;
+    display: grid;
+    gap: 2px;
+  }
+  .mobile-nav a {
+    display: block;
+    padding: 12px 10px;
+    color: var(--text);
+    font-family: var(--font-head);
+    font-weight: 600;
+    border-radius: 8px;
+  }
+  .mobile-nav a:hover {
+    background: var(--surface-low);
+    color: var(--nh-purple);
+  }
+
+  @media (max-width: 1080px) {
+    .auth-actions {
+      display: none;
+    }
+    .nav-toggle {
+      display: flex;
+    }
+  }
+  @media (max-width: 640px) {
+    .header-inner {
+      padding-inline: 16px;
+    }
+    .header-search {
+      min-width: 0;
+    }
+  }
+  @media (max-width: 460px) {
+    .header-search {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
+  const drawer = document.querySelector<HTMLElement>('#mobile-nav');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    toggle.setAttribute('aria-label', open ? 'Mở menu' : 'Đóng menu');
+    if (drawer) drawer.hidden = open;
+  });
+</script>

@@ -1,0 +1,325 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import type { Post } from '../lib/posts';
+import { postSlug, formatDate } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
+
+export interface Props {
+  post: Post;
+  related: Post[];
+}
+
+const { post, related } = Astro.props;
+const { data } = post;
+const slug = postSlug(post);
+const canonical = new URL(`/article/${slug}`, Astro.site).toString();
+const ogImage = data.image
+  ? new URL(data.image, Astro.site).toString()
+  : undefined;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: data.title,
+  description: data.excerpt,
+  image: ogImage ? [ogImage] : undefined,
+  datePublished: data.publishedAt.toISOString(),
+  dateModified: (data.updatedAt ?? data.publishedAt).toISOString(),
+  author: [{ '@type': 'Person', name: data.author }],
+  publisher: {
+    '@type': 'Organization',
+    name: 'NewsHub',
+    logo: {
+      '@type': 'ImageObject',
+      url: new URL('/assets/newshub-logo-white.png', Astro.site).toString(),
+    },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+  articleSection: categoryLabel(data.category),
+  keywords: data.tags.join(', '),
+};
+---
+
+<BaseLayout
+  title={data.title}
+  description={data.excerpt}
+  image={data.image}
+  type="article"
+  jsonLd={jsonLd}
+>
+  <article class="article">
+    <div class="container article-container">
+      <!-- breadcrumb -->
+      <nav class="breadcrumb" aria-label="Đường dẫn">
+        <a href="/">Trang chủ</a>
+        <span aria-hidden="true">/</span>
+        <a href={`/category/${data.category}`}>{categoryLabel(data.category)}</a>
+      </nav>
+
+      <header class="article-header">
+        <a href={`/category/${data.category}`} class="chip chip-solid">{categoryLabel(data.category)}</a>
+        <h1 class="article-title">{data.title}</h1>
+        <p class="article-excerpt">{data.excerpt}</p>
+
+        <div class="article-meta">
+          <div class="byline">
+            <span class="byline-author">{data.author}</span>
+            <span class="byline-dates">
+              <time datetime={data.publishedAt.toISOString()}>Đăng {formatDate(data.publishedAt)}</time>
+              {data.updatedAt && data.updatedAt.valueOf() !== data.publishedAt.valueOf() && (
+                <> · <time datetime={data.updatedAt.toISOString()}>Cập nhật {formatDate(data.updatedAt)}</time></>
+              )}
+              {data.readingTime && <> · {data.readingTime} phút đọc</>}
+            </span>
+          </div>
+          <div class="article-actions">
+            <button type="button" class="btn action-copy" data-url={canonical}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07L11 5"></path><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07L13 19"></path></svg>
+              <span class="action-label">Copy link</span>
+            </button>
+            <button type="button" class="btn action-save" data-slug={slug} data-title={data.title}>
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+              <span class="action-label">Lưu bài</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {data.image && (
+        <figure class="article-hero">
+          <img src={data.image} alt={data.imageAlt || data.title} fetchpriority="high" />
+          {data.imageAlt && <figcaption>{data.imageAlt}</figcaption>}
+        </figure>
+      )}
+
+      <div class="article-content">
+        <slot />
+      </div>
+
+      {data.tags.length > 0 && (
+        <div class="article-tags" aria-label="Thẻ">
+          {data.tags.map((tag) => (
+            <a href={`/search?q=${encodeURIComponent(tag)}`} class="tag">#{tag}</a>
+          ))}
+        </div>
+      )}
+    </div>
+
+    {related.length > 0 && (
+      <section class="related section" aria-label="Bài viết liên quan">
+        <div class="container">
+          <div class="section-head">
+            <h2 class="section-title">Bài viết liên quan</h2>
+          </div>
+          <div class="grid grid-3">
+            {related.map((p) => <ArticleCard post={p} headingLevel={3} />)}
+          </div>
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>
+
+<style>
+  .article-container {
+    max-width: 760px;
+  }
+  .breadcrumb {
+    display: flex;
+    gap: 8px;
+    padding-top: 24px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .breadcrumb a:hover {
+    color: var(--nh-purple);
+  }
+  .article-header {
+    padding-block: 18px 8px;
+  }
+  .article-title {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    line-height: 1.15;
+    margin: 14px 0 12px;
+  }
+  .article-excerpt {
+    font-size: 1.12rem;
+    color: var(--text-soft);
+    line-height: 1.6;
+    margin: 0 0 20px;
+  }
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-block: 16px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .byline-author {
+    font-family: var(--font-head);
+    font-weight: 700;
+    display: block;
+  }
+  .byline-dates {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+  .article-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .article-actions .btn {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+  .action-save.is-saved {
+    background: var(--nh-grad);
+    color: #fff;
+    border-color: transparent;
+  }
+
+  .article-hero {
+    margin: 26px 0;
+  }
+  .article-hero img {
+    width: 100%;
+    border-radius: 16px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .article-hero figcaption {
+    margin-top: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  /* ------ readable content typography ------ */
+  .article-content {
+    font-size: 1.09rem;
+    line-height: 1.8;
+    color: #1e293b;
+  }
+  .article-content :global(p) {
+    margin: 0 0 1.3em;
+  }
+  .article-content :global(h2) {
+    font-size: 1.5rem;
+    margin: 1.8em 0 0.6em;
+  }
+  .article-content :global(h3) {
+    font-size: 1.25rem;
+    margin: 1.5em 0 0.5em;
+  }
+  .article-content :global(a) {
+    color: var(--nh-purple);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .article-content :global(ul),
+  .article-content :global(ol) {
+    padding-left: 1.4em;
+    margin: 0 0 1.3em;
+  }
+  .article-content :global(li) {
+    margin-bottom: 0.5em;
+  }
+  .article-content :global(blockquote) {
+    margin: 1.5em 0;
+    padding: 4px 20px;
+    border-left: 4px solid var(--nh-purple);
+    background: rgba(139, 92, 246, 0.06);
+    color: var(--text-soft);
+    font-style: italic;
+    border-radius: 0 8px 8px 0;
+  }
+  .article-content :global(img) {
+    border-radius: 12px;
+    margin: 1.5em 0;
+  }
+  .article-content :global(pre) {
+    padding: 16px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    font-size: 0.9rem;
+  }
+  .article-content :global(code) {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  }
+
+  .article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 28px 0 12px;
+  }
+  .tag {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-soft);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+  .tag:hover {
+    color: var(--nh-purple);
+    border-color: var(--nh-purple);
+  }
+
+  .related {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    margin-top: 36px;
+  }
+</style>
+
+<script>
+  // Copy link
+  const copyBtn = document.querySelector<HTMLButtonElement>('.action-copy');
+  copyBtn?.addEventListener('click', async () => {
+    const url = copyBtn.dataset.url ?? window.location.href;
+    const label = copyBtn.querySelector('.action-label');
+    try {
+      await navigator.clipboard.writeText(url);
+      if (label) label.textContent = 'Đã copy!';
+      setTimeout(() => label && (label.textContent = 'Copy link'), 1800);
+    } catch {
+      if (label) label.textContent = 'Không copy được';
+    }
+  });
+
+  // Save with localStorage
+  const SAVE_KEY = 'newshub:saved';
+  const saveBtn = document.querySelector<HTMLButtonElement>('.action-save');
+  if (saveBtn) {
+    const slug = saveBtn.dataset.slug!;
+    const title = saveBtn.dataset.title ?? '';
+    const label = saveBtn.querySelector('.action-label');
+    const read = (): Record<string, string> => {
+      try {
+        return JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
+      } catch {
+        return {};
+      }
+    };
+    const render = () => {
+      const saved = slug in read();
+      saveBtn.classList.toggle('is-saved', saved);
+      if (label) label.textContent = saved ? 'Đã lưu' : 'Lưu bài';
+    };
+    render();
+    saveBtn.addEventListener('click', () => {
+      const store = read();
+      if (slug in store) delete store[slug];
+      else store[slug] = title;
+      localStorage.setItem(SAVE_KEY, JSON.stringify(store));
+      render();
+    });
+  }
+</script>

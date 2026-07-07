@@ -1,0 +1,150 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import SearchBox from '../components/SearchBox.astro';
+import CategoryNav from '../components/CategoryNav.astro';
+import { getPublishedPosts, postSlug } from '../lib/posts';
+import { categoryLabel } from '../lib/categories';
+
+const posts = await getPublishedPosts();
+
+// Precompute a searchable text blob per post (title, excerpt, category, tags, author).
+const items = posts.map((p) => ({
+  slug: postSlug(p),
+  category: p.data.category,
+  haystack: [
+    p.data.title,
+    p.data.excerpt,
+    categoryLabel(p.data.category),
+    p.data.category,
+    p.data.author,
+    ...p.data.tags,
+  ].join(' '),
+}));
+---
+
+<BaseLayout
+  title="Tìm kiếm bài viết"
+  description="Tìm kiếm và lọc tin công nghệ, AI, startup, an ninh mạng trên NewsHub."
+>
+  <div class="container search-page">
+    <header class="search-header">
+      <h1>Tìm kiếm bài viết</h1>
+      <div class="search-input-wrap">
+        <SearchBox variant="page" />
+      </div>
+      <div class="cat-row">
+        <CategoryNav />
+      </div>
+    </header>
+
+    <p class="search-status" aria-live="polite" data-total={items.length}></p>
+
+    <div class="grid grid-3 search-results">
+      {posts.map((p, i) => (
+        <div
+          class="search-item"
+          data-search={items[i].haystack}
+          data-category={items[i].category}
+        >
+          <ArticleCard post={p} headingLevel={2} />
+        </div>
+      ))}
+    </div>
+
+    <p class="search-empty" hidden>Không tìm thấy bài viết phù hợp. Thử từ khoá khác nhé.</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .search-page {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+  .search-header h1 {
+    font-size: clamp(1.7rem, 4vw, 2.4rem);
+    margin-bottom: 16px;
+  }
+  .search-input-wrap {
+    max-width: 560px;
+  }
+  .cat-row {
+    margin-top: 18px;
+  }
+  .search-status {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 20px 0 18px;
+  }
+  .search-item {
+    display: block;
+  }
+  .search-empty {
+    padding: 30px 0;
+    color: var(--text-muted);
+  }
+</style>
+
+<script>
+  // Diacritic-insensitive normalization for Vietnamese search.
+  const COMBINING = /[̀-ͯ]/g;
+  const normalize = (s: string) =>
+    s
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(COMBINING, '')
+      .replace(/đ/g, 'd')
+      .trim();
+
+  const items = Array.from(document.querySelectorAll<HTMLElement>('.search-item'));
+  const status = document.querySelector<HTMLElement>('.search-status');
+  const empty = document.querySelector<HTMLElement>('.search-empty');
+  const input = document.querySelector<HTMLInputElement>('.search-page input[name="q"]');
+  const total = Number(status?.dataset.total ?? items.length);
+
+  // Precompute normalized haystacks once.
+  const data = items.map((el) => ({
+    el,
+    text: normalize(el.dataset.search ?? ''),
+    category: el.dataset.category ?? '',
+  }));
+
+  let activeCategory = '';
+
+  function apply(query: string) {
+    const q = normalize(query);
+    const terms = q.split(/\s+/).filter(Boolean);
+    let shown = 0;
+    for (const d of data) {
+      const matchText = terms.every((t) => d.text.includes(t));
+      const matchCat = !activeCategory || d.category === activeCategory;
+      const visible = matchText && matchCat;
+      d.el.hidden = !visible;
+      if (visible) shown++;
+    }
+    if (empty) empty.hidden = shown !== 0;
+    if (status) {
+      if (!query && !activeCategory) {
+        status.textContent = `Đang hiển thị tất cả ${total} bài viết.`;
+      } else {
+        status.textContent = `Tìm thấy ${shown} bài viết${query ? ` cho “${query}”` : ''}.`;
+      }
+    }
+  }
+
+  // Read initial query from URL (?q= and ?category=).
+  const params = new URLSearchParams(window.location.search);
+  const initialQuery = params.get('q') ?? '';
+  activeCategory = params.get('category') ?? '';
+  if (input) input.value = initialQuery;
+
+  input?.addEventListener('input', () => apply(input.value));
+
+  // Intercept the form submit so it filters in place instead of reloading.
+  input?.closest('form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    apply(input?.value ?? '');
+  });
+
+  apply(initialQuery);
+</script>
