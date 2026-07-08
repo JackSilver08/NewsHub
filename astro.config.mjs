@@ -5,7 +5,7 @@ import sitemap from '@astrojs/sitemap';
 // Update `site` to your real production domain before deploying.
 // It is used for canonical URLs, sitemap, RSS and Open Graph tags.
 export default defineConfig({
-  site: 'https://newshub.vercel.app',
+  site: 'https://newshub-jack.netlify.app',
   trailingSlash: 'ignore',
   integrations: [sitemap()],
   markdown: {
