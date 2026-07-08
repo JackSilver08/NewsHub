@@ -25,7 +25,7 @@ This creates:
 
 ## 3. Configure local admin
 
-Edit `public/admin/supabase-config.js`:
+Edit `public/admin/supabase-config.js` or reuse the values from `docs/supabase-project.md`:
 
 ```js
 window.NEWSHUB_SUPABASE = {
