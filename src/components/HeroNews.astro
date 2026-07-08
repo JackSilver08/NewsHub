@@ -62,6 +62,7 @@ const url = `/article/${postSlug(post)}`;
   }
   .hero-main {
     position: relative;
+    isolation: isolate;
     display: block;
     border-radius: 12px;
     overflow: hidden;
@@ -69,6 +70,21 @@ const url = `/article/${postSlug(post)}`;
     background: var(--nh-dark);
     border: 0;
     box-shadow: var(--shadow);
+  }
+  .hero-main::before {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    z-index: 1;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 22% 24%, rgba(34, 211, 238, 0.24), transparent 30%),
+      radial-gradient(circle at 76% 14%, rgba(139, 92, 246, 0.24), transparent 32%),
+      linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.18) 48%, transparent 62%);
+    mix-blend-mode: screen;
+    opacity: 0.7;
+    transform: translate3d(-8%, -4%, 0);
+    animation: hero-light-drift 9s ease-in-out infinite alternate;
   }
   .hero-media,
   .hero-media img {
@@ -78,9 +94,21 @@ const url = `/article/${postSlug(post)}`;
     height: 100%;
     object-fit: cover;
   }
+  .hero-media {
+    overflow: hidden;
+    transform-origin: center;
+    z-index: 0;
+  }
+  .hero-media img {
+    transition: transform 0.7s ease;
+  }
+  .hero-main:hover .hero-media img {
+    transform: scale(1.035);
+  }
   .hero-overlay {
     position: absolute;
     inset: 0;
+    z-index: 2;
     background: linear-gradient(
       180deg,
       rgba(15, 23, 42, 0) 0%,
@@ -91,6 +119,7 @@ const url = `/article/${postSlug(post)}`;
   .hero-content {
     position: absolute;
     inset: auto 0 0 0;
+    z-index: 3;
     padding: 32px;
     color: #fff;
   }
@@ -243,6 +272,38 @@ const url = `/article/${postSlug(post)}`;
     }
     .hero-side-body {
       padding: 16px;
+    }
+  }
+
+  /* Ken-burns: ảnh hero phóng nhẹ rồi dừng, tạo cảm giác sống động */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-media {
+      animation: hero-kenburns 22s ease-out both;
+    }
+  }
+  @keyframes hero-kenburns {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes hero-light-drift {
+    from {
+      transform: translate3d(-8%, -4%, 0) rotate(0deg);
+    }
+    to {
+      transform: translate3d(8%, 5%, 0) rotate(4deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-main::before,
+    .hero-media {
+      animation: none;
+    }
+    .hero-media img {
+      transition: none;
     }
   }
 </style>

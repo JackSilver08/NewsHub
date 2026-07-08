@@ -42,12 +42,13 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  background: var(--bg);
 }
 
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
   line-height: 1.65;
   font-size: 16px;
@@ -251,5 +252,89 @@ p {
   }
   .section {
     padding-block: 28px;
+  }
+}
+
+/* ============ Motion & ambient effects ============ */
+
+/* Nền aurora động: các vệt màu mờ trôi nhẹ phía sau toàn site */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -25vmax;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 38vmax at 15% 18%, rgba(70, 72, 212, 0.18), transparent 60%),
+    radial-gradient(34vmax 34vmax at 85% 12%, rgba(34, 211, 238, 0.18), transparent 60%),
+    radial-gradient(42vmax 42vmax at 72% 88%, rgba(139, 92, 246, 0.14), transparent 62%);
+  filter: blur(18px);
+  animation: aurora-drift 18s ease-in-out infinite alternate;
+}
+/* Nội dung luôn nằm trên lớp aurora */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4%, 3%, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(-3%, -2%, 0) scale(1.04);
+  }
+}
+
+/* Hover card sang hơn: nâng nổi + đổ bóng tím nhẹ */
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 42px rgba(70, 72, 212, 0.16);
+}
+
+/* Hiện dần khi cuộn (scroll reveal). Chỉ bật khi JS chạy và người dùng
+   không yêu cầu giảm chuyển động — nếu không, nội dung hiển thị bình thường. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js-reveal :where(.hero, .ticker-wrap, .cat-row, .section-head, .card, .brief, .brief-card, .popular, .popular-item, .hero-side-item, [data-reveal]) {
+    opacity: 0;
+    transform: translateY(34px) scale(0.98);
+    transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: opacity, transform;
+  }
+  html.js-reveal :where(.hero, .ticker-wrap, .cat-row, .section-head, .card, .brief, .brief-card, .popular, .popular-item, .hero-side-item, [data-reveal]).in-view {
+    opacity: 1;
+    transform: none;
+  }
+  html.js-reveal .card.in-view:hover {
+    transform: translateY(-4px);
+  }
+  /* Card trong lưới hiện lần lượt (stagger) cho cảm giác cao cấp */
+  html.js-reveal .grid > .card:nth-child(2) {
+    transition-delay: 0.06s;
+  }
+  html.js-reveal .grid > .card:nth-child(3) {
+    transition-delay: 0.12s;
+  }
+  html.js-reveal .grid > .card:nth-child(4) {
+    transition-delay: 0.18s;
+  }
+  html.js-reveal .grid > .card:nth-child(5) {
+    transition-delay: 0.24s;
+  }
+  html.js-reveal .grid > .card:nth-child(6) {
+    transition-delay: 0.3s;
+  }
+}
+
+/* Tôn trọng người dùng tắt hiệu ứng chuyển động */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
   }
 }

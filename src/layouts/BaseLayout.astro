@@ -35,6 +35,15 @@ const ogImage = new URL(image, Astro.site).toString();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0B1020" />
+    <script is:inline>
+      // Bật scroll-reveal sớm để tránh nháy nội dung; tắt nếu người dùng
+      // yêu cầu giảm chuyển động.
+      try {
+        if (!window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          document.documentElement.classList.add('js-reveal');
+        }
+      } catch (e) {}
+    </script>
     <link rel="icon" href="/favicon.png" type="image/png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     <link rel="canonical" href={canonical} />
@@ -76,5 +85,48 @@ const ogImage = new URL(image, Astro.site).toString();
       <slot />
     </main>
     <Footer />
+
+    <script>
+      // Scroll reveal: gắn .in-view khi phần tử lọt vào khung nhìn.
+      (function () {
+        const html = document.documentElement;
+        if (!html.classList.contains('js-reveal')) return;
+        const selector = [
+          '.hero',
+          '.ticker-wrap',
+          '.cat-row',
+          '.section-head',
+          '.card',
+          '.brief',
+          '.brief-card',
+          '.popular',
+          '.popular-item',
+          '.hero-side-item',
+          '[data-reveal]',
+        ].join(', ');
+        const els = Array.prototype.slice.call(document.querySelectorAll(selector));
+        const revealAll = () => els.forEach((el) => el.classList.add('in-view'));
+        try {
+          if (!('IntersectionObserver' in window)) {
+            revealAll();
+            return;
+          }
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add('in-view');
+                  io.unobserve(entry.target);
+                }
+              });
+            },
+            { rootMargin: '0px 0px -8% 0px', threshold: 0.06 },
+          );
+          els.forEach((el) => io.observe(el));
+        } catch (e) {
+          revealAll();
+        }
+      })();
+    </script>
   </body>
 </html>
