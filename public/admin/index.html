@@ -12,11 +12,18 @@
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- EasyMDE: trình soạn Markdown hiện đại (toolbar, preview, fullscreen) -->
+    <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css" />
+    <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
     <script>
+      // Tiền kiểm nhanh: chưa có session Supabase thì chuyển đăng nhập ngay
+      // (module bên dưới sẽ kiểm tra role chính thức).
       (function () {
         try {
-          var auth = JSON.parse(localStorage.getItem('newshubAuth') || 'null');
-          if (!auth || auth.role !== 'admin' || auth.email !== 'admin@newshub.com') {
+          var hasSession = Object.keys(localStorage).some(function (key) {
+            return key.indexOf('sb-') === 0 && key.indexOf('-auth-token') !== -1;
+          });
+          if (!hasSession) {
             window.location.replace('/login?next=/admin/index.html');
           }
         } catch (error) {
@@ -160,10 +167,29 @@
         font-family: var(--font-head);
         font-weight: 800;
       }
+      .role-badge {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        border-radius: 999px;
+        padding: 0 9px;
+        background: #eef2ff;
+        color: var(--purple);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
       .content {
         padding: 28px;
         display: grid;
         gap: 24px;
+      }
+      [data-admin-view] {
+        display: grid;
+        gap: 24px;
+      }
+      [data-admin-view][hidden] {
+        display: none;
       }
       .stats {
         display: grid;
@@ -255,10 +281,245 @@
         font-size: 0.78rem;
         font-weight: 800;
       }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .action-button,
+      .ghost {
+        min-height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border-strong);
+        background: #fff;
+        color: var(--text);
+        padding: 0 10px;
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .action-button.danger {
+        color: #b91c1c;
+        border-color: #fecaca;
+      }
+      .form-actions {
+        display: flex;
+        gap: 10px;
+      }
+      .form-actions .primary {
+        flex: 1;
+      }
+      .user-role-select {
+        min-width: 150px;
+      }
+      .user-management {
+        min-height: 0;
+      }
+      .user-panel-head {
+        align-items: flex-start;
+      }
+      .user-panel-head p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .user-count-pill {
+        min-height: 32px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0 12px;
+        background: var(--surface-low);
+        color: var(--text);
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .user-table-wrap {
+        overflow-x: auto;
+      }
+      .user-cell {
+        display: grid;
+        gap: 4px;
+      }
+      .user-cell strong {
+        font-family: var(--font-head);
+      }
+      .user-cell span,
+      .detail-value.muted {
+        color: var(--muted);
+      }
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        background: rgba(11, 16, 32, 0.55);
+      }
+      .modal-backdrop[hidden] {
+        display: none;
+      }
+      .modal {
+        width: min(100%, 560px);
+        max-height: calc(100vh - 40px);
+        overflow: auto;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+      }
+      .modal-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .modal-head h2 {
+        margin: 0;
+        font-family: var(--font-head);
+        font-size: 1.12rem;
+      }
+      .modal-head p {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+      .modal-close {
+        width: 34px;
+        height: 34px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 1.2rem;
+        line-height: 1;
+      }
+      .modal-body {
+        padding: 20px;
+        display: grid;
+        gap: 14px;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .detail-item {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--surface-low);
+      }
+      .detail-label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      .detail-value {
+        overflow-wrap: anywhere;
+        font-weight: 700;
+      }
+      .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 20px 20px;
+      }
+      .danger-note {
+        margin: 0;
+        border-radius: 8px;
+        padding: 10px 12px;
+        color: #b91c1c;
+        background: #fee2e2;
+        font-size: 0.88rem;
+      }
       .quick-form {
         padding: 18px;
         display: grid;
         gap: 14px;
+      }
+      .icon-btn {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--muted);
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        display: inline-grid;
+        place-items: center;
+        cursor: pointer;
+        transition: color 0.15s ease, border-color 0.15s ease;
+      }
+      .icon-btn:hover {
+        color: var(--purple);
+        border-color: var(--purple);
+      }
+      /* Chỉ hiện 1 icon theo trạng thái mở rộng */
+      #composePanel:not(.compose-expanded) [data-icon-collapse] {
+        display: none;
+      }
+      #composePanel.compose-expanded [data-icon-expand] {
+        display: none;
+      }
+      .compose-cols {
+        display: grid;
+        gap: 14px;
+      }
+      .compose-main,
+      .compose-side {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+        min-width: 0;
+      }
+      .compose-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(11, 16, 32, 0.55);
+        z-index: 190;
+      }
+      .compose-backdrop[hidden] {
+        display: none;
+      }
+      #composePanel.compose-expanded {
+        position: fixed;
+        inset: 3vh 3vw;
+        z-index: 200;
+        margin: 0;
+        max-width: none;
+        overflow: auto;
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.4);
+      }
+      #composePanel.compose-expanded .compose-cols {
+        grid-template-columns: minmax(300px, 380px) 1fr;
+        gap: 26px;
+        align-items: start;
+      }
+      #composePanel.compose-expanded .EasyMDEContainer .CodeMirror {
+        min-height: 55vh;
+      }
+      /* EasyMDE khớp giao diện admin */
+      .EasyMDEContainer .CodeMirror {
+        border-radius: 0 0 8px 8px;
+        border-color: var(--border-strong);
+        min-height: 220px;
+        font-family: var(--font-body);
+        color: var(--text);
+      }
+      .editor-toolbar {
+        border-radius: 8px 8px 0 0;
+        border-color: var(--border-strong);
+      }
+      .editor-toolbar button:hover {
+        background: var(--surface-low);
+        border-color: var(--border);
+      }
+      .EasyMDEContainer .editor-statusbar {
+        color: var(--muted);
       }
       .field-row {
         display: grid;
@@ -383,10 +644,11 @@
           <span>Bảng điều khiển quản trị</span>
         </a>
         <nav class="nav" aria-label="Admin">
-          <a href="/admin/index.html" class="active">Dashboard</a>
+          <a href="#dashboard" class="active" data-admin-tab="dashboard">Dashboard</a>
+          <a href="#users" data-admin-tab="users" data-admin-only>Quản lý người dùng</a>
+          <a href="#comments" data-admin-tab="comments">Kiểm duyệt bình luận</a>
           <a href="/">Xem website</a>
           <a href="/search">Tìm bài viết</a>
-          <a href="/rss.xml">RSS</a>
         </nav>
         <button class="logout" type="button" id="logoutButton">Đăng xuất</button>
       </aside>
@@ -396,146 +658,335 @@
           <h1>Dashboard</h1>
           <div class="admin-user">
             <span id="adminEmail">admin@newshub.com</span>
+            <span class="role-badge" id="roleBadge">Admin</span>
             <span class="avatar" aria-hidden="true">A</span>
           </div>
         </header>
 
         <section class="content">
-          <div class="stats" aria-label="Thống kê">
-            <article class="stat">
-              <span>Bài viết</span>
-              <strong id="postCount">0</strong>
-            </article>
-            <article class="stat">
-              <span>Nháp</span>
-              <strong id="draftCount">0</strong>
-            </article>
-            <article class="stat">
-              <span>Tài khoản</span>
-              <strong id="userCount">1</strong>
-            </article>
-            <article class="stat">
-              <span>Trạng thái</span>
-              <strong id="storageStatus">Local</strong>
-            </article>
-          </div>
+          <section data-admin-view="dashboard">
+            <div class="stats" aria-label="Thống kê">
+              <article class="stat">
+                <span>Bài viết</span>
+                <strong id="postCount">0</strong>
+              </article>
+              <article class="stat">
+                <span>Nháp</span>
+                <strong id="draftCount">0</strong>
+              </article>
+              <article class="stat" data-admin-only>
+                <span>Tài khoản</span>
+                <strong id="userCount">1</strong>
+              </article>
+              <article class="stat">
+                <span>Trạng thái</span>
+                <strong id="storageStatus">Local</strong>
+              </article>
+            </div>
 
-          <div class="grid">
-            <section class="panel">
-              <div class="panel-head">
-                <h2>Bài viết gần đây</h2>
-                <a href="/search">Xem tất cả</a>
+            <div class="grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>Bài viết gần đây</h2>
+                  <a href="/search">Xem tất cả</a>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tiêu đề</th>
+                      <th>Chuyên mục</th>
+                      <th>Ngày</th>
+                      <th>Trạng thái</th>
+                      <th>Thao tác</th>
+                    </tr>
+                  </thead>
+                  <tbody id="postTable">
+                    <tr>
+                      <td colspan="5">Đang tải dữ liệu...</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+
+              <section class="panel" id="composePanel">
+                <div class="panel-head">
+                  <h2>Đăng bài</h2>
+                  <button type="button" class="icon-btn" id="expandComposeBtn" title="Mở rộng khung viết" aria-label="Mở rộng khung viết">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-icon-expand>
+                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
+                    </svg>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" data-icon-collapse>
+                      <path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path>
+                    </svg>
+                  </button>
+                </div>
+                <form class="quick-form" id="postForm">
+                  <input name="postId" type="hidden" />
+                  <input name="existingImageUrl" type="hidden" />
+                  <div class="compose-cols">
+                  <div class="compose-main">
+                  <label>
+                    Tiêu đề
+                    <input name="title" placeholder="Nhập tiêu đề bài viết" required />
+                  </label>
+                  <label>
+                    Slug
+                    <input name="slug" placeholder="tu-dong-tao-tu-tieu-de" />
+                  </label>
+                  <label>
+                    Tóm tắt
+                    <textarea name="excerpt" placeholder="Mô tả ngắn hiển thị ở card bài viết" required></textarea>
+                  </label>
+                  <label>
+                    Chuyên mục
+                    <select name="category">
+                      <option value="ai">AI</option>
+                      <option value="thiet-bi">Thiết bị</option>
+                      <option value="startup">Startup</option>
+                      <option value="an-ninh-mang">An ninh mạng</option>
+                      <option value="lap-trinh">Lập trình</option>
+                      <option value="cloud">Cloud</option>
+                      <option value="danh-gia">Đánh giá</option>
+                    </select>
+                  </label>
+                  <div class="field-row">
+                    <label>
+                      Trạng thái
+                      <select name="status">
+                        <option value="draft">Nháp</option>
+                        <option value="published">Đăng ngay</option>
+                      </select>
+                    </label>
+                    <label>
+                      Ưu tiên
+                      <input name="sectionPriority" type="number" value="0" />
+                    </label>
+                  </div>
+                  <label>
+                    Tags
+                    <input name="tags" placeholder="AI, Startup, Cloud" />
+                  </label>
+                  <label>
+                    Ảnh đại diện
+                    <input name="image" type="file" accept="image/*" />
+                  </label>
+                  <label>
+                    Alt ảnh
+                    <input name="imageAlt" placeholder="Mô tả ảnh cho SEO và accessibility" />
+                  </label>
+                  <label>
+                    Vị trí hiển thị trang chủ
+                    <span class="checkbox-grid">
+                      <label><input type="checkbox" name="sections" value="home-hero" /> Hero chính</label>
+                      <label><input type="checkbox" name="sections" value="home-side" /> Cột tin bên phải hero</label>
+                      <label><input type="checkbox" name="sections" value="breaking-news" /> Tin nóng</label>
+                      <label><input type="checkbox" name="sections" value="latest-news" /> Cập nhật mới nhất</label>
+                      <label><input type="checkbox" name="sections" value="popular-sidebar" /> Đọc nhiều</label>
+                      <label><input type="checkbox" name="sections" value="ai-daily-brief" /> AI Daily Brief</label>
+                      <label><input type="checkbox" name="sections" value="tech-trends" /> Xu hướng công nghệ</label>
+                    </span>
+                  </label>
+                  </div>
+                  <div class="compose-side">
+                  <label class="content-label">
+                    Nội dung
+                    <textarea name="content" placeholder="Viết nội dung bài bằng Markdown hoặc văn bản thường..."></textarea>
+                  </label>
+                  <p class="muted-note">Nếu chưa điền Supabase config, bài sẽ được lưu local để test form.</p>
+                  <p class="notice" id="postNotice" hidden></p>
+                  <div class="form-actions">
+                    <button class="primary" type="submit" id="savePostButton">Lưu bài</button>
+                    <button class="ghost" type="button" id="cancelEditButton" hidden>Hủy sửa</button>
+                  </div>
+                  </div>
+                  </div>
+                </form>
+                <div class="draft-list" id="draftList"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="panel user-management" id="userManagement" data-admin-view="users" data-admin-only hidden>
+            <div class="panel-head user-panel-head">
+              <div>
+                <h2>Quản lý người dùng</h2>
+                <p>Kiểm tra hồ sơ, chỉnh thông tin, phân quyền hoặc xóa tài khoản theo yêu cầu.</p>
               </div>
+              <span class="user-count-pill" id="userCountLabel">0 tài khoản</span>
+            </div>
+            <div class="user-table-wrap">
               <table>
                 <thead>
                   <tr>
-                    <th>Tiêu đề</th>
-                    <th>Chuyên mục</th>
-                    <th>Ngày</th>
-                    <th>Trạng thái</th>
+                    <th>Tài khoản</th>
+                    <th>Vai trò</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
-                <tbody id="postTable">
-                  <tr>
-                    <td colspan="4">Đang tải dữ liệu...</td>
-                  </tr>
-                </tbody>
+                <tbody id="userTable"></tbody>
               </table>
-            </section>
+            </div>
+          </section>
 
-            <section class="panel">
-              <div class="panel-head">
-                <h2>Đăng bài</h2>
+          <section class="panel" id="commentModeration" data-admin-view="comments" hidden>
+            <div class="panel-head user-panel-head">
+              <div>
+                <h2>Kiểm duyệt bình luận</h2>
+                <p>Toàn bộ bình luận trên site. Bạn có thể xóa bất kỳ bình luận nào.</p>
               </div>
-              <form class="quick-form" id="postForm">
-                <label>
-                  Tiêu đề
-                  <input name="title" placeholder="Nhập tiêu đề bài viết" required />
-                </label>
-                <label>
-                  Slug
-                  <input name="slug" placeholder="tu-dong-tao-tu-tieu-de" />
-                </label>
-                <label>
-                  Tóm tắt
-                  <textarea name="excerpt" placeholder="Mô tả ngắn hiển thị ở card bài viết" required></textarea>
-                </label>
-                <label>
-                  Chuyên mục
-                  <select name="category">
-                    <option value="ai">AI</option>
-                    <option value="thiet-bi">Thiết bị</option>
-                    <option value="startup">Startup</option>
-                    <option value="an-ninh-mang">An ninh mạng</option>
-                    <option value="lap-trinh">Lập trình</option>
-                    <option value="cloud">Cloud</option>
-                    <option value="danh-gia">Đánh giá</option>
-                  </select>
-                </label>
-                <div class="field-row">
-                  <label>
-                    Trạng thái
-                    <select name="status">
-                      <option value="draft">Nháp</option>
-                      <option value="published">Đăng ngay</option>
-                    </select>
-                  </label>
-                  <label>
-                    Ưu tiên
-                    <input name="sectionPriority" type="number" value="0" />
-                  </label>
-                </div>
-                <label>
-                  Tags
-                  <input name="tags" placeholder="AI, Startup, Cloud" />
-                </label>
-                <label>
-                  Ảnh đại diện
-                  <input name="image" type="file" accept="image/*" />
-                </label>
-                <label>
-                  Alt ảnh
-                  <input name="imageAlt" placeholder="Mô tả ảnh cho SEO và accessibility" />
-                </label>
-                <label>
-                  Vị trí hiển thị trang chủ
-                  <span class="checkbox-grid">
-                    <label><input type="checkbox" name="sections" value="home-hero" /> Hero chính</label>
-                    <label><input type="checkbox" name="sections" value="home-side" /> Cột tin bên phải hero</label>
-                    <label><input type="checkbox" name="sections" value="breaking-news" /> Tin nóng</label>
-                    <label><input type="checkbox" name="sections" value="latest-news" /> Cập nhật mới nhất</label>
-                    <label><input type="checkbox" name="sections" value="popular-sidebar" /> Đọc nhiều</label>
-                    <label><input type="checkbox" name="sections" value="ai-daily-brief" /> AI Daily Brief</label>
-                    <label><input type="checkbox" name="sections" value="tech-trends" /> Xu hướng công nghệ</label>
-                  </span>
-                </label>
-                <label>
-                  Nội dung
-                  <textarea name="content" placeholder="Viết nội dung bài bằng Markdown hoặc văn bản thường..." required></textarea>
-                </label>
-                <p class="muted-note">Nếu chưa điền Supabase config, bài sẽ được lưu local để test form.</p>
-                <p class="notice" id="postNotice" hidden></p>
-                <button class="primary" type="submit">Lưu bài</button>
-              </form>
-              <div class="draft-list" id="draftList"></div>
-            </section>
-          </div>
+              <span class="user-count-pill" id="commentCountLabel">0 bình luận</span>
+            </div>
+            <div class="user-table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Người viết</th>
+                    <th>Nội dung</th>
+                    <th>Bài viết</th>
+                    <th>Thời gian</th>
+                    <th>Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody id="commentTable"></tbody>
+              </table>
+            </div>
+          </section>
         </section>
       </main>
     </div>
 
+    <div class="modal-backdrop" id="editUserModal" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="editUserTitle">
+        <div class="modal-head">
+          <div>
+            <h2 id="editUserTitle">Sửa vai trò</h2>
+            <p>Đổi họ tên hiển thị và vai trò của tài khoản.</p>
+          </div>
+          <button class="modal-close" type="button" data-close-modal aria-label="Đóng">×</button>
+        </div>
+        <form id="editUserForm">
+          <div class="modal-body">
+            <input name="userId" type="hidden" />
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Email</span>
+                <span class="detail-value" id="editCurrentEmail">-</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Ngày tạo</span>
+                <span class="detail-value" id="editCreatedAt">-</span>
+              </div>
+            </div>
+            <label>
+              Họ tên
+              <input name="name" required />
+            </label>
+            <label>
+              Vai trò
+              <select name="role">
+                <option value="user">Người dùng</option>
+                <option value="moderator">Moderator</option>
+              </select>
+            </label>
+            <p class="notice" id="editUserNotice" hidden></p>
+          </div>
+          <div class="modal-actions">
+            <button class="ghost" type="button" data-close-modal>Hủy</button>
+            <button class="primary" type="submit">Lưu thay đổi</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+
     <script type="module">
       import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-      var auth = JSON.parse(localStorage.getItem('newshubAuth') || 'null');
-      document.documentElement.classList.remove('checking-auth');
-      document.getElementById('adminEmail').textContent = auth && auth.email ? auth.email : 'admin@newshub.com';
+      var ADMIN_EMAIL = 'admin@newshub.com';
       var supabaseConfig = window.NEWSHUB_SUPABASE || {};
       var supabaseReady = Boolean(supabaseConfig.url && supabaseConfig.anonKey);
       var supabaseClient = supabaseReady
         ? createClient(supabaseConfig.url, supabaseConfig.anonKey)
         : null;
       var imageBucket = supabaseConfig.imageBucket || 'post-images';
+
+      function goToLogin() {
+        window.location.replace('/login?next=/admin/index.html');
+      }
+
+      if (!supabaseClient) {
+        goToLogin();
+        await new Promise(function () {});
+      }
+
+      var sessionResult = await supabaseClient.auth.getSession();
+      var session = sessionResult.data.session;
+      if (!session) {
+        goToLogin();
+        await new Promise(function () {});
+      }
+
+      var profileResult = await supabaseClient
+        .from('profiles')
+        .select('name, role, email')
+        .eq('id', session.user.id)
+        .maybeSingle();
+      var profile = profileResult.data || {};
+      var currentRole = profile.role === 'admin'
+        ? 'admin'
+        : profile.role === 'moderator'
+          ? 'moderator'
+          : 'user';
+      var currentUser = {
+        id: session.user.id,
+        email: session.user.email || '',
+        name: profile.name || session.user.email || 'Người dùng',
+        role: currentRole,
+      };
+      // Alias để tương thích chỗ code cũ còn tham chiếu `auth`.
+      var auth = currentUser;
+
+      var isAdmin = currentRole === 'admin';
+      var canManagePosts = currentRole === 'admin' || currentRole === 'moderator';
+      if (!canManagePosts) {
+        window.location.replace('/account');
+        await new Promise(function () {});
+      }
+      document.documentElement.classList.remove('checking-auth');
+      document.getElementById('adminEmail').textContent = currentUser.email;
+      document.getElementById('roleBadge').textContent = currentRole === 'moderator' ? 'Moderator' : 'Admin';
+      document.querySelectorAll('[data-admin-only]').forEach(function (element) {
+        element.hidden = !isAdmin;
+      });
+
+      var tabTitles = { users: 'Quản lý người dùng', comments: 'Kiểm duyệt bình luận', dashboard: 'Dashboard' };
+
+      function setAdminTab(tab) {
+        var nextTab = tab === 'users' && isAdmin ? 'users' : tab === 'comments' ? 'comments' : 'dashboard';
+        document.querySelectorAll('[data-admin-view]').forEach(function (view) {
+          view.hidden = view.dataset.adminView !== nextTab;
+        });
+        document.querySelectorAll('[data-admin-tab]').forEach(function (link) {
+          link.classList.toggle('active', link.dataset.adminTab === nextTab);
+        });
+        document.querySelector('.topbar h1').textContent = tabTitles[nextTab] || 'Dashboard';
+        if (window.location.hash !== '#' + nextTab) {
+          window.history.replaceState(null, '', '#' + nextTab);
+        }
+        if (nextTab === 'comments') renderComments();
+      }
+
+      document.querySelectorAll('[data-admin-tab]').forEach(function (link) {
+        link.addEventListener('click', function (event) {
+          event.preventDefault();
+          setAdminTab(event.currentTarget.dataset.adminTab);
+        });
+      });
+      var initialHash = (window.location.hash || '').replace('#', '');
+      setAdminTab(initialHash === 'users' || initialHash === 'comments' ? initialHash : 'dashboard');
+
+      var currentPosts = [];
       var categoryLabels = {
         'ai': 'AI',
         'thiet-bi': 'Thiết bị',
@@ -546,8 +997,243 @@
         'danh-gia': 'Đánh giá',
       };
 
-      document.getElementById('logoutButton').addEventListener('click', function () {
-        localStorage.removeItem('newshubAuth');
+      function normalizeUserRole(role, email) {
+        if (email === ADMIN_EMAIL) return 'admin';
+        if (role === 'moderator' || role === 'mod') return 'moderator';
+        return 'user';
+      }
+
+      var profilesCache = [];
+
+      async function fetchProfiles() {
+        if (!supabaseClient) return [];
+        var res = await supabaseClient
+          .from('profiles')
+          .select('id, name, email, role, created_at')
+          .order('created_at', { ascending: true });
+        if (res.error) {
+          console.warn('Không tải được profiles:', res.error.message);
+          return [];
+        }
+        return res.data || [];
+      }
+
+      function roleLabel(role) {
+        if (role === 'admin') return 'Admin';
+        if (role === 'moderator') return 'Moderator';
+        return 'Người dùng';
+      }
+
+      function formatUserDate(value) {
+        return value ? new Date(value).toLocaleDateString('vi-VN') : '-';
+      }
+
+      async function renderUsers() {
+        var users = await fetchProfiles();
+        profilesCache = users;
+        var userCount = document.getElementById('userCount');
+        if (userCount) userCount.textContent = String(users.length);
+        var userCountLabel = document.getElementById('userCountLabel');
+        if (userCountLabel) userCountLabel.textContent = String(users.length) + ' tài khoản';
+        if (!isAdmin) return;
+
+        var table = document.getElementById('userTable');
+        table.innerHTML = '';
+
+        users.forEach(function (user) {
+          var row = document.createElement('tr');
+          var account = document.createElement('td');
+          var role = document.createElement('td');
+          var created = document.createElement('td');
+          var actions = document.createElement('td');
+          var rolePill = document.createElement('span');
+          var editButton = document.createElement('button');
+
+          account.innerHTML = '<span class="user-cell"><strong></strong><span></span></span>';
+          account.querySelector('strong').textContent = user.name || user.email || 'User';
+          account.querySelector('span').textContent = user.email || '';
+          rolePill.className = 'pill';
+          rolePill.textContent = roleLabel(user.role);
+          role.append(rolePill);
+          created.textContent = formatUserDate(user.created_at);
+
+          actions.className = 'actions';
+          editButton.className = 'action-button';
+          editButton.type = 'button';
+          editButton.textContent = 'Sửa vai trò';
+          // Không cho tự hạ quyền admin gốc.
+          if (user.role === 'admin') {
+            editButton.disabled = true;
+          } else {
+            editButton.addEventListener('click', function () {
+              openEditUserModal(user.id);
+            });
+          }
+          actions.append(editButton);
+          row.append(account, role, created, actions);
+          table.append(row);
+        });
+      }
+
+      function showModalNotice(element, text, type) {
+        element.textContent = text;
+        element.className = type === 'error' ? 'notice error' : 'notice';
+        element.hidden = false;
+      }
+
+      function formatCommentTime(value) {
+        return value
+          ? new Date(value).toLocaleString('vi-VN', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : '-';
+      }
+
+      async function renderComments() {
+        if (!supabaseClient) return;
+        var table = document.getElementById('commentTable');
+        var label = document.getElementById('commentCountLabel');
+        var res = await supabaseClient
+          .from('comments')
+          .select('id, post_slug, author_name, author_role, content, created_at')
+          .order('created_at', { ascending: false })
+          .limit(300);
+
+        if (res.error) {
+          if (label) label.textContent = 'Lỗi tải bình luận';
+          return;
+        }
+
+        var rows = res.data || [];
+        if (label) label.textContent = rows.length + ' bình luận';
+        table.innerHTML = '';
+
+        rows.forEach(function (row) {
+          var tr = document.createElement('tr');
+
+          var who = document.createElement('td');
+          var whoWrap = document.createElement('span');
+          whoWrap.className = 'user-cell';
+          var strong = document.createElement('strong');
+          strong.textContent = row.author_name || 'Người dùng';
+          var small = document.createElement('span');
+          small.textContent = row.author_role === 'admin' ? 'Admin' : row.author_role === 'moderator' ? 'Moderator' : 'Người dùng';
+          whoWrap.append(strong, small);
+          who.append(whoWrap);
+
+          var content = document.createElement('td');
+          content.textContent = row.content || '';
+          content.style.maxWidth = '360px';
+
+          var post = document.createElement('td');
+          var link = document.createElement('a');
+          link.href = '/article/' + row.post_slug;
+          link.target = '_blank';
+          link.textContent = row.post_slug;
+          link.style.color = 'var(--purple)';
+          post.append(link);
+
+          var time = document.createElement('td');
+          time.textContent = formatCommentTime(row.created_at);
+
+          var actions = document.createElement('td');
+          actions.className = 'actions';
+          var del = document.createElement('button');
+          del.className = 'action-button danger';
+          del.type = 'button';
+          del.textContent = 'Xóa';
+          del.addEventListener('click', async function () {
+            if (!window.confirm('Xóa bình luận này?')) return;
+            var d = await supabaseClient.from('comments').delete().eq('id', row.id);
+            if (d.error) {
+              showNotice('Không xóa được: ' + d.error.message, 'error');
+              return;
+            }
+            tr.remove();
+            renderComments();
+          });
+          actions.append(del);
+
+          tr.append(who, content, post, time, actions);
+          table.append(tr);
+        });
+      }
+
+      function findUserById(id) {
+        return profilesCache.find(function (user) {
+          return user.id === id;
+        });
+      }
+
+      function closeUserModals() {
+        document.getElementById('editUserModal').hidden = true;
+      }
+
+      function openEditUserModal(id) {
+        var user = findUserById(id);
+        if (!user) return;
+
+        var modal = document.getElementById('editUserModal');
+        var form = document.getElementById('editUserForm');
+        var notice = document.getElementById('editUserNotice');
+        notice.hidden = true;
+        form.reset();
+        form.elements.userId.value = user.id;
+        form.elements.name.value = user.name || '';
+        form.elements.role.value = user.role === 'moderator' ? 'moderator' : 'user';
+        document.getElementById('editCurrentEmail').textContent = user.email || '-';
+        document.getElementById('editCreatedAt').textContent = formatUserDate(user.created_at);
+        modal.hidden = false;
+        form.elements.name.focus();
+      }
+
+      document.querySelectorAll('[data-close-modal]').forEach(function (button) {
+        button.addEventListener('click', closeUserModals);
+      });
+
+      document.querySelectorAll('.modal-backdrop').forEach(function (backdrop) {
+        backdrop.addEventListener('click', function (event) {
+          if (event.target === backdrop) closeUserModals();
+        });
+      });
+
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') closeUserModals();
+      });
+
+      document.getElementById('editUserForm').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        var form = event.currentTarget;
+        var notice = document.getElementById('editUserNotice');
+        var userId = String(form.elements.userId.value || '');
+        var name = String(form.elements.name.value || '').trim();
+        var role = form.elements.role.value === 'moderator' ? 'moderator' : 'user';
+
+        if (!name) {
+          showModalNotice(notice, 'Vui lòng nhập họ tên.', 'error');
+          return;
+        }
+
+        var res = await supabaseClient
+          .from('profiles')
+          .update({ name: name, role: role })
+          .eq('id', userId)
+          .select('id');
+        if (res.error) {
+          showModalNotice(notice, 'Không lưu được: ' + res.error.message, 'error');
+          return;
+        }
+
+        await renderUsers();
+        closeUserModals();
+      });
+
+      document.getElementById('logoutButton').addEventListener('click', async function () {
+        if (supabaseClient) await supabaseClient.auth.signOut();
         window.location.href = '/login';
       });
 
@@ -608,6 +1294,7 @@
       }
 
       function renderPosts(items) {
+        currentPosts = items;
         var table = document.getElementById('postTable');
         table.innerHTML = '';
         document.getElementById('postCount').textContent = String(
@@ -627,6 +1314,7 @@
           var category = document.createElement('td');
           var date = document.createElement('td');
           var status = document.createElement('td');
+          var actions = document.createElement('td');
           var pill = document.createElement('span');
 
           title.className = 'title-cell';
@@ -636,9 +1324,82 @@
           pill.className = 'pill';
           pill.textContent = item.status === 'draft' ? 'Nháp' : 'Đã đăng';
           status.append(pill);
-          row.append(title, category, date, status);
+          actions.className = 'actions';
+          if (item.id && supabaseClient) {
+            var editButton = document.createElement('button');
+            var deleteButton = document.createElement('button');
+            editButton.className = 'action-button';
+            editButton.type = 'button';
+            editButton.textContent = 'Sửa';
+            editButton.addEventListener('click', function () {
+              startEditPost(item.id);
+            });
+            deleteButton.className = 'action-button danger';
+            deleteButton.type = 'button';
+            deleteButton.textContent = 'Xóa';
+            deleteButton.addEventListener('click', function () {
+              deletePost(item.id);
+            });
+            actions.append(editButton, deleteButton);
+          } else {
+            actions.textContent = '-';
+          }
+          row.append(title, category, date, status, actions);
           table.append(row);
         });
+      }
+
+      function resetPostForm() {
+        var postForm = document.getElementById('postForm');
+        postForm.reset();
+        if (easyMDE) easyMDE.value('');
+        postForm.elements.postId.value = '';
+        postForm.elements.existingImageUrl.value = '';
+        postForm.querySelector('input[name="slug"]').dataset.touched = '';
+        document.getElementById('savePostButton').textContent = 'Lưu bài';
+        document.getElementById('cancelEditButton').hidden = true;
+      }
+
+      function startEditPost(id) {
+        var post = currentPosts.find(function (item) {
+          return item.id === id;
+        });
+        if (!post) return;
+
+        var postForm = document.getElementById('postForm');
+        postForm.elements.postId.value = post.id || '';
+        postForm.elements.existingImageUrl.value = post.image_url || '';
+        postForm.elements.title.value = post.title || '';
+        postForm.elements.slug.value = post.slug || '';
+        postForm.elements.slug.dataset.touched = 'true';
+        postForm.elements.excerpt.value = post.excerpt || '';
+        postForm.elements.content.value = post.content || '';
+        if (easyMDE) easyMDE.value(post.content || '');
+        postForm.elements.category.value = post.category || 'ai';
+        postForm.elements.status.value = post.status || 'draft';
+        postForm.elements.sectionPriority.value = post.section_priority || 0;
+        postForm.elements.tags.value = Array.isArray(post.tags) ? post.tags.join(', ') : '';
+        postForm.elements.imageAlt.value = post.image_alt || '';
+        postForm.querySelectorAll('input[name="sections"]').forEach(function (checkbox) {
+          checkbox.checked = Array.isArray(post.sections) && post.sections.includes(checkbox.value);
+        });
+        document.getElementById('savePostButton').textContent = 'Cập nhật bài';
+        document.getElementById('cancelEditButton').hidden = false;
+        postForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      async function deletePost(id) {
+        if (!supabaseClient || !id) return;
+        if (!window.confirm('Xóa bài viết này?')) return;
+
+        var result = await supabaseClient.from('posts').delete().eq('id', id);
+        if (result.error) {
+          showNotice('Không xóa được bài: ' + result.error.message, 'error');
+          return;
+        }
+
+        showNotice('Đã xóa bài.', 'success');
+        await loadPosts();
       }
 
       async function loadPosts() {
@@ -647,7 +1408,7 @@
         if (supabaseClient) {
           var result = await supabaseClient
             .from('posts')
-            .select('id,title,category,status,published_at,created_at')
+            .select('id,title,slug,excerpt,content,category,tags,author,status,image_url,image_alt,sections,section_priority,popular_score,featured,trending,published_at,created_at')
             .order('created_at', { ascending: false })
             .limit(30);
 
@@ -656,8 +1417,18 @@
               result.data.map(function (item) {
                 return {
                   title: item.title,
+                  id: item.id,
+                  slug: item.slug,
+                  excerpt: item.excerpt,
+                  content: item.content,
                   category: item.category,
+                  tags: item.tags || [],
+                  author: item.author,
                   status: item.status,
+                  image_url: item.image_url,
+                  image_alt: item.image_alt,
+                  sections: item.sections || [],
+                  section_priority: item.section_priority || 0,
                   date: item.published_at || item.created_at
                     ? new Date(item.published_at || item.created_at).toLocaleDateString('vi-VN')
                     : '',
@@ -711,12 +1482,15 @@
       document.getElementById('postForm').addEventListener('submit', async function (event) {
         event.preventDefault();
         var postForm = event.currentTarget;
+        if (easyMDE) postForm.elements.content.value = easyMDE.value();
         var data = new FormData(postForm);
         var title = String(data.get('title') || '').trim();
         var slug = slugify(String(data.get('slug') || '').trim() || title);
         var status = String(data.get('status') || 'draft');
         var sections = data.getAll('sections').map(String);
         var file = data.get('image');
+        var postId = String(data.get('postId') || '').trim();
+        var existingImageUrl = String(data.get('existingImageUrl') || '').trim();
         var post = {
           title: title,
           slug: slug,
@@ -724,9 +1498,9 @@
           content: String(data.get('content') || '').trim(),
           category: String(data.get('category') || 'ai'),
           tags: parseTags(data.get('tags')),
-          author: 'NewsHub Admin',
+          author: auth && auth.name ? auth.name : 'NewsHub Admin',
           status: status,
-          image_url: '',
+          image_url: existingImageUrl,
           image_alt: String(data.get('imageAlt') || '').trim(),
           sections: sections,
           section_priority: Number(data.get('sectionPriority') || 0),
@@ -749,7 +1523,7 @@
             createdAt: new Date().toISOString(),
           };
           setDrafts([draft].concat(getDrafts()).slice(0, 12));
-          postForm.reset();
+          resetPostForm();
           showNotice('Chưa cấu hình Supabase. Bài đã lưu local để test form.', 'error');
           renderDrafts();
           return;
@@ -760,15 +1534,24 @@
             post.image_url = await uploadImage(file, post.slug);
           }
 
-          var insert = await supabaseClient.from('posts').insert(post).select('id').single();
-          if (insert.error) throw insert.error;
+          if (postId) {
+            var update = await supabaseClient.from('posts').update(post).eq('id', postId).select('id').single();
+            if (update.error) throw update.error;
+          } else {
+            var insert = await supabaseClient.from('posts').insert(post).select('id').single();
+            if (insert.error) throw insert.error;
+          }
 
-          postForm.reset();
-          showNotice('Đã lưu bài vào Supabase.', 'success');
+          resetPostForm();
+          showNotice(postId ? 'Đã cập nhật bài trong Supabase.' : 'Đã lưu bài vào Supabase.', 'success');
           await loadPosts();
         } catch (error) {
           showNotice('Không lưu được bài: ' + error.message, 'error');
         }
+      });
+
+      document.getElementById('cancelEditButton').addEventListener('click', function () {
+        resetPostForm();
       });
 
       document.querySelector('input[name="title"]').addEventListener('input', function (event) {
@@ -782,8 +1565,59 @@
         event.target.dataset.touched = 'true';
       });
 
-      var users = JSON.parse(localStorage.getItem('newshubUsers') || '[]');
-      document.getElementById('userCount').textContent = String(users.length + 1);
+      // ----- Trình soạn Markdown (EasyMDE) -----
+      var easyMDE = null;
+      var contentTextarea = document.querySelector('#postForm textarea[name="content"]');
+      if (contentTextarea && window.EasyMDE) {
+        easyMDE = new EasyMDE({
+          element: contentTextarea,
+          spellChecker: false,
+          autoDownloadFontAwesome: true,
+          placeholder: 'Viết nội dung bài bằng Markdown…',
+          status: ['lines', 'words'],
+          toolbar: [
+            'bold', 'italic', 'heading', '|',
+            'quote', 'unordered-list', 'ordered-list', '|',
+            'link', 'image', 'code', 'table', '|',
+            'preview', 'side-by-side', 'fullscreen', '|',
+            'guide',
+          ],
+        });
+      }
+
+      // ----- Mở rộng khung viết (modal) -----
+      var composePanel = document.getElementById('composePanel');
+      var expandBtn = document.getElementById('expandComposeBtn');
+      var composeBackdrop = document.createElement('div');
+      composeBackdrop.className = 'compose-backdrop';
+      composeBackdrop.hidden = true;
+      document.body.appendChild(composeBackdrop);
+
+      function setComposeExpanded(expanded) {
+        composePanel.classList.toggle('compose-expanded', expanded);
+        composeBackdrop.hidden = !expanded;
+        expandBtn.title = expanded ? 'Thu nhỏ' : 'Mở rộng khung viết';
+        document.body.style.overflow = expanded ? 'hidden' : '';
+        if (easyMDE) {
+          setTimeout(function () {
+            easyMDE.codemirror.refresh();
+          }, 50);
+        }
+      }
+
+      expandBtn.addEventListener('click', function () {
+        setComposeExpanded(!composePanel.classList.contains('compose-expanded'));
+      });
+      composeBackdrop.addEventListener('click', function () {
+        setComposeExpanded(false);
+      });
+      document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && composePanel.classList.contains('compose-expanded')) {
+          setComposeExpanded(false);
+        }
+      });
+
+      renderUsers();
       if (!supabaseReady) {
         renderDrafts();
       }

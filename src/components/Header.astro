@@ -206,16 +206,20 @@ import SearchBox from './SearchBox.astro';
 
   const loginLink = document.querySelector<HTMLAnchorElement>('[data-auth-login]');
   const signupLink = document.querySelector<HTMLAnchorElement>('[data-auth-signup]');
-  const auth = localStorage.getItem('newshubAuth');
-  if (auth && loginLink && signupLink) {
-    loginLink.href = '/admin/index.html';
-    loginLink.textContent = 'Admin';
+
+  import('../lib/supabaseBrowser').then(async ({ supabaseBrowser, getCurrentUser }) => {
+    const user = await getCurrentUser();
+    if (!user || !loginLink || !signupLink) return;
+
+    const isStaff = user.role === 'admin' || user.role === 'moderator';
+    loginLink.href = isStaff ? '/admin/index.html' : '/account';
+    loginLink.textContent = isStaff ? 'Admin' : 'Tài khoản';
     signupLink.href = '#logout';
     signupLink.textContent = 'Đăng xuất';
-    signupLink.addEventListener('click', (event) => {
+    signupLink.addEventListener('click', async (event) => {
       event.preventDefault();
-      localStorage.removeItem('newshubAuth');
+      await supabaseBrowser.auth.signOut();
       window.location.href = '/login';
     });
-  }
+  });
 </script>

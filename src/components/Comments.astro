@@ -1,0 +1,543 @@
+---
+export interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+---
+
+<section class="comments" aria-label="Bình luận" data-comments data-slug={slug}>
+  <div class="container comments-inner">
+    <h2 class="comments-title">Bình luận <span data-comment-count></span></h2>
+
+    <!-- Ô soạn bình luận (chỉ khi đã đăng nhập) -->
+    <form class="comment-composer" data-composer hidden>
+      <textarea
+        name="content"
+        rows="3"
+        maxlength="4000"
+        placeholder="Chia sẻ suy nghĩ của bạn…"
+        required
+      ></textarea>
+      <div class="composer-actions">
+        <span class="composer-as">Bình luận với tên <strong data-me-name></strong></span>
+        <button type="submit">Gửi bình luận</button>
+      </div>
+    </form>
+
+    <!-- Nhắc đăng nhập -->
+    <p class="comment-login" data-login-prompt hidden>
+      <a data-login-link href="/login">Đăng nhập</a> để tham gia bình luận.
+    </p>
+
+    <div class="comment-toolbar" data-toolbar hidden>
+      <label>
+        Sắp xếp
+        <select data-sort>
+          <option value="newest">Mới nhất</option>
+          <option value="oldest">Cũ nhất</option>
+        </select>
+      </label>
+    </div>
+
+    <p class="comment-status" data-status>Đang tải bình luận…</p>
+    <div class="comment-list" data-list></div>
+  </div>
+</section>
+
+<!-- Style global (khóa trong .comments) vì các thẻ bình luận được tạo động
+     bằng JS nên không nhận được style scoped của Astro. -->
+<style is:global>
+  .comments {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    margin-top: 36px;
+    padding-block: 34px 52px;
+  }
+  .comments .comments-inner {
+    max-width: 760px;
+  }
+  .comments .comments-title {
+    font-size: 1.4rem;
+    margin: 0 0 22px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .comments .comments-title span {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  /* Ô soạn bình luận */
+  .comments .comment-composer {
+    display: grid;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 30px;
+  }
+  .comments textarea {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font: inherit;
+    color: var(--text);
+    background: #fff;
+    resize: vertical;
+  }
+  .comments textarea:focus {
+    outline: 2px solid var(--ring);
+    border-color: var(--nh-purple);
+  }
+  .comments .composer-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .comments .composer-as {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+  }
+  .comments .composer-as strong {
+    color: var(--text);
+  }
+  .comments .comment-composer > button,
+  .comments .comment-reply button {
+    justify-self: start;
+    border: 0;
+    border-radius: 9px;
+    background: var(--nh-grad);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.86rem;
+    padding: 9px 18px;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+  }
+  .comments .comment-composer > button:hover,
+  .comments .comment-reply button:hover {
+    opacity: 0.9;
+  }
+  .comments button[disabled] {
+    opacity: 0.55;
+    cursor: default;
+  }
+
+  /* Nhắc đăng nhập */
+  .comments .comment-login {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 28px;
+    color: var(--text-soft);
+  }
+  .comments .comment-login a {
+    color: var(--nh-purple);
+    font-weight: 800;
+  }
+
+  .comments .comment-status {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+  .comments .comment-toolbar {
+    margin-bottom: 14px;
+  }
+  .comments .comment-toolbar label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+  .comments .comment-toolbar select {
+    font: inherit;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: #fff;
+    color: var(--text);
+  }
+
+  /* Danh sách bình luận */
+  .comments .comment-list {
+    display: grid;
+    gap: 22px;
+  }
+  .comments .comment {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .comments .comment-avatar {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--nh-grad);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1rem;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .comments .comment-main {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .comments .comment-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px 14px 14px 14px;
+    padding: 12px 16px;
+  }
+  .comments .comment-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .comments .comment-author {
+    font-family: var(--font-head);
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .comments .comment-badge {
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: var(--nh-purple);
+    background: rgba(70, 72, 212, 0.12);
+    border-radius: 999px;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .comments .comment-time {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .comments .comment-body {
+    color: #1e293b;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .comments .comment-actions {
+    display: flex;
+    gap: 16px;
+    margin: 8px 2px 0;
+  }
+  .comments .comment-actions button {
+    background: none;
+    border: 0;
+    padding: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .comments .comment-actions button:hover {
+    color: var(--nh-purple);
+  }
+  .comments .comment-actions button.link-danger:hover {
+    color: #b91c1c;
+  }
+
+  /* Trả lời (thụt vào 1 cấp) */
+  .comments .comment-replies {
+    display: grid;
+    gap: 18px;
+    margin-top: 18px;
+    padding-left: 20px;
+    border-left: 2px solid var(--border);
+  }
+  .comments .comment-replies .comment-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  /* Form trả lời inline */
+  .comments .comment-reply {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+  }
+</style>
+
+<script>
+  import { supabaseBrowser, getCurrentUser } from '../lib/supabaseBrowser';
+
+  const root = document.querySelector<HTMLElement>('[data-comments]');
+  if (root) {
+    const slug = root.dataset.slug || '';
+    const listEl = root.querySelector<HTMLElement>('[data-list]')!;
+    const statusEl = root.querySelector<HTMLElement>('[data-status]')!;
+    const countEl = root.querySelector<HTMLElement>('[data-comment-count]')!;
+    const composer = root.querySelector<HTMLFormElement>('[data-composer]')!;
+    const loginPrompt = root.querySelector<HTMLElement>('[data-login-prompt]')!;
+    const loginLink = root.querySelector<HTMLAnchorElement>('[data-login-link]')!;
+    const meNameEl = root.querySelector<HTMLElement>('[data-me-name]')!;
+    const toolbar = root.querySelector<HTMLElement>('[data-toolbar]')!;
+    const sortSelect = root.querySelector<HTMLSelectElement>('[data-sort]')!;
+
+    sortSelect.addEventListener('change', () => {
+      sortNewest = sortSelect.value === 'newest';
+      loadComments();
+    });
+
+    type Me = { id: string; name: string; role: string } | null;
+    let me: Me = null;
+
+    type Comment = {
+      id: string;
+      parent_id: string | null;
+      user_id: string;
+      author_name: string;
+      author_role: string;
+      content: string;
+      created_at: string;
+    };
+
+    let sortNewest = true;
+
+    const canModerate = () => me?.role === 'admin' || me?.role === 'moderator';
+
+    function formatTime(iso: string): string {
+      const d = new Date(iso);
+      return d.toLocaleString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    }
+
+    function initial(name: string): string {
+      const t = (name || '').trim();
+      return t ? t.charAt(0).toUpperCase() : 'U';
+    }
+
+    function buildComment(c: Comment, isReply: boolean): HTMLElement {
+      const wrap = document.createElement('div');
+      wrap.className = 'comment';
+
+      const avatar = document.createElement('div');
+      avatar.className = 'comment-avatar';
+      avatar.textContent = initial(c.author_name);
+
+      const main = document.createElement('div');
+      main.className = 'comment-main';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'comment-bubble';
+
+      const head = document.createElement('div');
+      head.className = 'comment-head';
+      const author = document.createElement('span');
+      author.className = 'comment-author';
+      author.textContent = c.author_name;
+      head.appendChild(author);
+      if (c.author_role === 'admin' || c.author_role === 'moderator') {
+        const badge = document.createElement('span');
+        badge.className = 'comment-badge';
+        badge.textContent = c.author_role === 'admin' ? 'Admin' : 'Mod';
+        head.appendChild(badge);
+      }
+      const time = document.createElement('span');
+      time.className = 'comment-time';
+      time.textContent = formatTime(c.created_at);
+      head.appendChild(time);
+
+      const body = document.createElement('div');
+      body.className = 'comment-body';
+      body.textContent = c.content;
+
+      bubble.appendChild(head);
+      bubble.appendChild(body);
+      main.appendChild(bubble);
+
+      const actions = document.createElement('div');
+      actions.className = 'comment-actions';
+
+      // Trả lời: chỉ ở bình luận gốc, và phải đăng nhập.
+      if (me && !isReply) {
+        const replyBtn = document.createElement('button');
+        replyBtn.type = 'button';
+        replyBtn.textContent = 'Trả lời';
+        replyBtn.addEventListener('click', () => toggleReplyForm(main, c.id));
+        actions.appendChild(replyBtn);
+      }
+
+      // Xóa: tác giả của mình hoặc admin/moderator.
+      if (me && (me.id === c.user_id || canModerate())) {
+        const delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'link-danger';
+        delBtn.textContent = 'Xóa';
+        delBtn.addEventListener('click', () => deleteComment(c.id));
+        actions.appendChild(delBtn);
+      }
+
+      if (actions.childElementCount) main.appendChild(actions);
+
+      wrap.appendChild(avatar);
+      wrap.appendChild(main);
+      return wrap;
+    }
+
+    function toggleReplyForm(parentEl: HTMLElement, parentId: string) {
+      const existing = parentEl.querySelector('.comment-reply');
+      if (existing) {
+        existing.remove();
+        return;
+      }
+      const form = document.createElement('form');
+      form.className = 'comment-reply';
+      const textarea = document.createElement('textarea');
+      textarea.rows = 2;
+      textarea.maxLength = 4000;
+      textarea.required = true;
+      textarea.placeholder = 'Viết trả lời…';
+      const btn = document.createElement('button');
+      btn.type = 'submit';
+      btn.textContent = 'Gửi trả lời';
+      form.appendChild(textarea);
+      form.appendChild(btn);
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const content = textarea.value.trim();
+        if (!content) return;
+        btn.disabled = true;
+        await insertComment(content, parentId);
+        btn.disabled = false;
+      });
+      parentEl.appendChild(form);
+      textarea.focus();
+    }
+
+    async function insertComment(content: string, parentId: string | null) {
+      if (!me) return;
+      const { error } = await supabaseBrowser.from('comments').insert({
+        post_slug: slug,
+        parent_id: parentId,
+        user_id: me.id,
+        author_name: me.name,
+        author_role: me.role,
+        content,
+      });
+      if (error) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Không gửi được bình luận: ' + error.message;
+        return;
+      }
+      await loadComments();
+    }
+
+    async function deleteComment(id: string) {
+      if (!window.confirm('Xóa bình luận này?')) return;
+      const { error } = await supabaseBrowser.from('comments').delete().eq('id', id);
+      if (error) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Không xóa được: ' + error.message;
+        return;
+      }
+      await loadComments();
+    }
+
+    async function loadComments() {
+      const { data, error } = await supabaseBrowser
+        .from('comments')
+        .select('id, parent_id, user_id, author_name, author_role, content, created_at')
+        .eq('post_slug', slug)
+        .order('created_at', { ascending: true });
+
+      if (error) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Không tải được bình luận.';
+        return;
+      }
+
+      const comments = (data || []) as Comment[];
+      const roots = comments.filter((c) => !c.parent_id);
+      roots.sort((a, b) => {
+        const diff = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        return sortNewest ? -diff : diff;
+      });
+      const repliesByParent = new Map<string, Comment[]>();
+      for (const c of comments) {
+        if (c.parent_id) {
+          const arr = repliesByParent.get(c.parent_id) || [];
+          arr.push(c);
+          repliesByParent.set(c.parent_id, arr);
+        }
+      }
+
+      countEl.textContent = comments.length ? `(${comments.length})` : '';
+      toolbar.hidden = roots.length === 0;
+      listEl.innerHTML = '';
+
+      if (!roots.length) {
+        statusEl.hidden = false;
+        statusEl.textContent = 'Chưa có bình luận nào. Hãy là người đầu tiên!';
+        return;
+      }
+      statusEl.hidden = true;
+
+      for (const root of roots) {
+        const node = buildComment(root, false);
+        const replies = repliesByParent.get(root.id) || [];
+        if (replies.length) {
+          const repliesWrap = document.createElement('div');
+          repliesWrap.className = 'comment-replies';
+          for (const r of replies) {
+            repliesWrap.appendChild(buildComment(r, true));
+          }
+          const main = node.querySelector('.comment-main');
+          (main || node).appendChild(repliesWrap);
+        }
+        listEl.appendChild(node);
+      }
+    }
+
+    // Khởi tạo
+    (async () => {
+      me = await getCurrentUser();
+      if (me) {
+        composer.hidden = false;
+        meNameEl.textContent = me.name;
+      } else {
+        loginPrompt.hidden = false;
+        loginLink.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+      }
+
+      composer.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const textarea = composer.querySelector('textarea')!;
+        const content = textarea.value.trim();
+        if (!content) return;
+        const btn = composer.querySelector('button')!;
+        btn.disabled = true;
+        await insertComment(content, null);
+        textarea.value = '';
+        btn.disabled = false;
+      });
+
+      await loadComments();
+    })();
+  }
+</script>

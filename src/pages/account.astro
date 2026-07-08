@@ -1,0 +1,396 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Tài khoản"
+  description="Quản lý tài khoản NewsHub của bạn."
+>
+  <section class="account-page">
+    <div class="account-shell" data-account-shell>
+      <aside class="account-summary">
+        <span class="avatar" data-avatar>U</span>
+        <div>
+          <h1 data-account-name>Tài khoản</h1>
+          <p data-account-email></p>
+        </div>
+        <span class="role-pill" data-account-role>Người dùng</span>
+      </aside>
+
+      <div class="account-panels">
+        <form class="panel" id="profileForm">
+          <div class="panel-head">
+            <h2>Thông tin cá nhân</h2>
+          </div>
+          <label>
+            Họ tên
+            <input name="name" autocomplete="name" required />
+          </label>
+          <p class="notice" id="profileNotice" hidden></p>
+          <button type="submit">Lưu thay đổi</button>
+        </form>
+
+        <form class="panel" id="passwordForm">
+          <div class="panel-head">
+            <h2>Mật khẩu</h2>
+          </div>
+          <label>
+            Mật khẩu hiện tại
+            <input name="currentPassword" type="password" autocomplete="current-password" />
+          </label>
+          <label>
+            Mật khẩu mới
+            <input name="newPassword" type="password" autocomplete="new-password" minlength="6" />
+          </label>
+          <p class="notice" id="passwordNotice" hidden></p>
+          <button type="submit">Đổi mật khẩu</button>
+        </form>
+
+        <div class="panel" id="savedPanel">
+          <div class="panel-head">
+            <h2>Bài đã lưu</h2>
+          </div>
+          <ul class="saved-list" id="savedList"></ul>
+          <p class="saved-empty" id="savedEmpty" hidden>Bạn chưa lưu bài viết nào.</p>
+        </div>
+
+        <div class="panel account-actions">
+          <a class="admin-link" href="/admin/index.html" data-admin-link hidden>Mở trang quản trị</a>
+          <button type="button" class="logout" id="logoutButton">Đăng xuất</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .account-page {
+    min-height: calc(100vh - 64px);
+    background: var(--surface-low);
+    padding: 42px 20px;
+  }
+  .account-shell {
+    width: min(100%, 980px);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+  .account-summary,
+  .panel {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  }
+  .account-summary {
+    padding: 22px;
+    display: grid;
+    gap: 16px;
+  }
+  .avatar {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: var(--nh-grad);
+    color: #fff;
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 1.4rem;
+  }
+  h1,
+  h2,
+  p {
+    margin: 0;
+  }
+  h1 {
+    font-family: var(--font-head);
+    font-size: 1.45rem;
+  }
+  .account-summary p {
+    margin-top: 6px;
+    color: var(--text-muted);
+    overflow-wrap: anywhere;
+  }
+  .role-pill {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 999px;
+    padding: 0 10px;
+    color: var(--nh-purple);
+    background: rgba(70, 72, 212, 0.1);
+    font-weight: 800;
+    font-size: 0.8rem;
+  }
+  .account-panels {
+    display: grid;
+    gap: 18px;
+  }
+  .panel {
+    padding: 18px;
+    display: grid;
+    gap: 14px;
+  }
+  .panel-head {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .panel-head h2 {
+    font-family: var(--font-head);
+    font-size: 1.05rem;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    color: var(--text-soft);
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+  input {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 12px 13px;
+    font: inherit;
+    color: var(--text);
+    background: #fff;
+  }
+  input:focus {
+    outline: 2px solid var(--ring);
+    border-color: var(--nh-purple);
+  }
+  button,
+  .admin-link {
+    min-height: 42px;
+    border: 0;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 14px;
+    font-family: var(--font-head);
+    font-weight: 800;
+    cursor: pointer;
+  }
+  button {
+    background: #000;
+    color: #fff;
+  }
+  .admin-link {
+    background: var(--surface-low);
+    color: var(--text);
+    border: 1px solid var(--border-strong);
+  }
+  .logout {
+    background: #fee2e2;
+    color: #b91c1c;
+  }
+  .notice {
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: #166534;
+    background: #dcfce7;
+    font-size: 0.88rem;
+  }
+  .notice.error {
+    color: #b91c1c;
+    background: #fee2e2;
+  }
+  .account-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .saved-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .saved-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .saved-list a {
+    font-weight: 600;
+    color: var(--text);
+    overflow-wrap: anywhere;
+  }
+  .saved-list a:hover {
+    color: var(--nh-purple);
+  }
+  .saved-remove {
+    flex: 0 0 auto;
+    min-height: 32px !important;
+    padding: 0 12px !important;
+    font-size: 0.8rem;
+    background: #fee2e2 !important;
+    color: #b91c1c !important;
+  }
+  .saved-empty {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 760px) {
+    .account-shell,
+    .account-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  import { supabaseBrowser, getCurrentUser } from '../lib/supabaseBrowser';
+
+  const profileForm = document.querySelector<HTMLFormElement>('#profileForm');
+  const passwordForm = document.querySelector<HTMLFormElement>('#passwordForm');
+  const profileNotice = document.querySelector<HTMLElement>('#profileNotice');
+  const passwordNotice = document.querySelector<HTMLElement>('#passwordNotice');
+  const adminLink = document.querySelector<HTMLAnchorElement>('[data-admin-link]');
+
+  function roleLabel(role: string) {
+    if (role === 'admin') return 'Admin';
+    if (role === 'moderator') return 'Moderator';
+    return 'Người dùng';
+  }
+
+  function showNotice(element: HTMLElement | null, text: string, type: 'success' | 'error') {
+    if (!element) return;
+    element.textContent = text;
+    element.className = type === 'error' ? 'notice error' : 'notice';
+    element.hidden = false;
+  }
+
+  const current = await getCurrentUser();
+  if (!current) {
+    window.location.replace('/login?next=/account');
+  } else {
+    document.querySelector('[data-account-name]')!.textContent = current.name;
+    document.querySelector('[data-account-email]')!.textContent = current.email;
+    document.querySelector('[data-account-role]')!.textContent = roleLabel(current.role);
+    document.querySelector('[data-avatar]')!.textContent =
+      current.name.trim().charAt(0).toUpperCase() || 'U';
+    const nameInput = profileForm?.elements.namedItem('name') as HTMLInputElement | null;
+    if (nameInput) nameInput.value = current.name;
+    if (adminLink) adminLink.hidden = current.role === 'user';
+  }
+
+  async function loadSaved() {
+    if (!current) return;
+    const listEl = document.getElementById('savedList');
+    const emptyEl = document.getElementById('savedEmpty');
+    if (!listEl) return;
+
+    const { data } = await supabaseBrowser
+      .from('saved_posts')
+      .select('post_slug, post_title, created_at')
+      .eq('user_id', current.id)
+      .order('created_at', { ascending: false });
+
+    const items = data || [];
+    listEl.innerHTML = '';
+    if (!items.length) {
+      if (emptyEl) emptyEl.hidden = false;
+      return;
+    }
+    if (emptyEl) emptyEl.hidden = true;
+
+    for (const item of items) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = '/article/' + item.post_slug;
+      a.textContent = item.post_title || item.post_slug;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'saved-remove';
+      btn.textContent = 'Bỏ lưu';
+      btn.addEventListener('click', async () => {
+        btn.disabled = true;
+        await supabaseBrowser
+          .from('saved_posts')
+          .delete()
+          .eq('user_id', current.id)
+          .eq('post_slug', item.post_slug);
+        li.remove();
+        if (!listEl.childElementCount && emptyEl) emptyEl.hidden = false;
+      });
+      li.appendChild(a);
+      li.appendChild(btn);
+      listEl.appendChild(li);
+    }
+  }
+
+  loadSaved();
+
+  profileForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!current) return;
+
+    const formData = new FormData(profileForm);
+    const name = String(formData.get('name') || '').trim();
+    if (!name) {
+      showNotice(profileNotice, 'Vui lòng nhập họ tên.', 'error');
+      return;
+    }
+
+    const { error: profileError } = await supabaseBrowser
+      .from('profiles')
+      .update({ name })
+      .eq('id', current.id);
+    if (profileError) {
+      showNotice(profileNotice, 'Không cập nhật được: ' + profileError.message, 'error');
+      return;
+    }
+    await supabaseBrowser.auth.updateUser({ data: { name } });
+
+    document.querySelector('[data-account-name]')!.textContent = name;
+    document.querySelector('[data-avatar]')!.textContent = name.charAt(0).toUpperCase();
+    showNotice(profileNotice, 'Đã cập nhật thông tin.', 'success');
+  });
+
+  passwordForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    if (!current) return;
+
+    const formData = new FormData(passwordForm);
+    const currentPassword = String(formData.get('currentPassword') || '');
+    const newPassword = String(formData.get('newPassword') || '');
+
+    if (newPassword.length < 6) {
+      showNotice(passwordNotice, 'Mật khẩu mới cần tối thiểu 6 ký tự.', 'error');
+      return;
+    }
+
+    // Xác minh mật khẩu hiện tại bằng cách đăng nhập lại.
+    const { error: verifyError } = await supabaseBrowser.auth.signInWithPassword({
+      email: current.email,
+      password: currentPassword,
+    });
+    if (verifyError) {
+      showNotice(passwordNotice, 'Mật khẩu hiện tại chưa đúng.', 'error');
+      return;
+    }
+
+    const { error: updateError } = await supabaseBrowser.auth.updateUser({ password: newPassword });
+    if (updateError) {
+      showNotice(passwordNotice, 'Không đổi được mật khẩu: ' + updateError.message, 'error');
+      return;
+    }
+
+    passwordForm.reset();
+    showNotice(passwordNotice, 'Đã đổi mật khẩu.', 'success');
+  });
+
+  document.querySelector('#logoutButton')?.addEventListener('click', async () => {
+    await supabaseBrowser.auth.signOut();
+    window.location.href = '/login';
+  });
+</script>

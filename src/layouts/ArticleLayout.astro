@@ -1,6 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import ArticleCard from '../components/ArticleCard.astro';
+import Comments from '../components/Comments.astro';
 import type { Post } from '../lib/posts';
 import { postSlug, formatDate } from '../lib/posts';
 import { categoryLabel } from '../lib/categories';
@@ -105,6 +106,8 @@ const jsonLd = {
         </div>
       )}
     </div>
+
+    <Comments slug={slug} />
 
     {related.length > 0 && (
       <section class="related section" aria-label="Bài viết liên quan">
@@ -294,32 +297,51 @@ const jsonLd = {
     }
   });
 
-  // Save with localStorage
-  const SAVE_KEY = 'newshub:saved';
+  // Lưu bài vào Supabase (gắn tài khoản, đồng bộ đa thiết bị)
   const saveBtn = document.querySelector<HTMLButtonElement>('.action-save');
   if (saveBtn) {
     const slug = saveBtn.dataset.slug!;
     const title = saveBtn.dataset.title ?? '';
     const label = saveBtn.querySelector('.action-label');
-    const read = (): Record<string, string> => {
-      try {
-        return JSON.parse(localStorage.getItem(SAVE_KEY) || '{}');
-      } catch {
-        return {};
+
+    import('../lib/supabaseBrowser').then(async ({ supabaseBrowser, getCurrentUser }) => {
+      const me = await getCurrentUser();
+      let saved = false;
+
+      const paint = () => {
+        saveBtn.classList.toggle('is-saved', saved);
+        if (label) label.textContent = saved ? 'Đã lưu' : 'Lưu bài';
+      };
+
+      if (me) {
+        const { data } = await supabaseBrowser
+          .from('saved_posts')
+          .select('post_slug')
+          .eq('user_id', me.id)
+          .eq('post_slug', slug)
+          .maybeSingle();
+        saved = Boolean(data);
+        paint();
       }
-    };
-    const render = () => {
-      const saved = slug in read();
-      saveBtn.classList.toggle('is-saved', saved);
-      if (label) label.textContent = saved ? 'Đã lưu' : 'Lưu bài';
-    };
-    render();
-    saveBtn.addEventListener('click', () => {
-      const store = read();
-      if (slug in store) delete store[slug];
-      else store[slug] = title;
-      localStorage.setItem(SAVE_KEY, JSON.stringify(store));
-      render();
+
+      saveBtn.addEventListener('click', async () => {
+        if (!me) {
+          window.location.href = '/login?next=' + encodeURIComponent(window.location.pathname);
+          return;
+        }
+        saveBtn.disabled = true;
+        if (saved) {
+          await supabaseBrowser.from('saved_posts').delete().eq('user_id', me.id).eq('post_slug', slug);
+          saved = false;
+        } else {
+          await supabaseBrowser
+            .from('saved_posts')
+            .insert({ user_id: me.id, post_slug: slug, post_title: title });
+          saved = true;
+        }
+        saveBtn.disabled = false;
+        paint();
+      });
     });
   }
 </script>

@@ -225,8 +225,8 @@ const next = Astro.url.searchParams.get('next') || '/admin/index.html';
 </style>
 
 <script>
-  const ADMIN_EMAIL = 'admin@newshub.com';
-  const ADMIN_PASSWORD = 'admin@1234';
+  import { supabaseBrowser, getCurrentUser } from '../lib/supabaseBrowser';
+
   const page = document.querySelector<HTMLElement>('.auth-page');
   const loginForm = document.querySelector<HTMLFormElement>('#loginForm');
   const signupForm = document.querySelector<HTMLFormElement>('#signupForm');
@@ -237,6 +237,16 @@ const next = Astro.url.searchParams.get('next') || '/admin/index.html';
   const showSignup = document.querySelector<HTMLAnchorElement>('[data-show-signup]');
   const showLogin = document.querySelector<HTMLAnchorElement>('[data-show-login]');
   const nextUrl = page?.dataset.next || '/admin/index.html';
+
+  /** Điều hướng sau khi đăng nhập theo role. */
+  function redirectAfterAuth(role: string) {
+    const isStaff = role === 'admin' || role === 'moderator';
+    if (nextUrl.startsWith('/admin') && !isStaff) {
+      window.location.href = '/account';
+    } else {
+      window.location.href = nextUrl;
+    }
+  }
 
   function setMode(mode: 'login' | 'signup', pushState = true) {
     if (loginPanel && signupPanel) {
@@ -255,11 +265,22 @@ const next = Astro.url.searchParams.get('next') || '/admin/index.html';
     }
   }
 
+  function showLoginError(text?: string) {
+    if (!error) return;
+    if (text) error.textContent = text;
+    error.hidden = false;
+  }
+
   function showSignupMessage(text: string, type: 'success' | 'error') {
     if (!signupMessage) return;
     signupMessage.textContent = text;
     signupMessage.className = `form-message ${type}`;
     signupMessage.hidden = false;
+  }
+
+  function setBusy(form: HTMLFormElement, busy: boolean) {
+    const button = form.querySelector('button[type="submit"]') as HTMLButtonElement | null;
+    if (button) button.disabled = busy;
   }
 
   showSignup?.addEventListener('click', (event) => {
@@ -280,31 +301,39 @@ const next = Astro.url.searchParams.get('next') || '/admin/index.html';
   const initialMode = new URLSearchParams(window.location.search).get('mode');
   setMode(initialMode === 'signup' ? 'signup' : 'login', false);
 
-  loginForm?.addEventListener('submit', (event) => {
+  // Đã đăng nhập sẵn thì chuyển thẳng.
+  getCurrentUser().then((user) => {
+    if (user) redirectAfterAuth(user.role);
+  });
+
+  loginForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (error) error.hidden = true;
+
     const formData = new FormData(loginForm);
     const email = String(formData.get('email') || '').trim().toLowerCase();
     const password = String(formData.get('password') || '');
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      localStorage.setItem(
-        'newshubAuth',
-        JSON.stringify({
-          email,
-          name: 'NewsHub Admin',
-          role: 'admin',
-          signedInAt: new Date().toISOString(),
-        }),
-      );
-      window.location.href = nextUrl;
+    setBusy(loginForm, true);
+    const { error: signInError } = await supabaseBrowser.auth.signInWithPassword({
+      email,
+      password,
+    });
+    setBusy(loginForm, false);
+
+    if (signInError) {
+      showLoginError('Email hoặc mật khẩu chưa đúng.');
       return;
     }
 
-    if (error) error.hidden = false;
+    const user = await getCurrentUser();
+    redirectAfterAuth(user?.role || 'user');
   });
 
-  signupForm?.addEventListener('submit', (event) => {
+  signupForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (signupMessage) signupMessage.hidden = true;
+
     const formData = new FormData(signupForm);
     const name = String(formData.get('name') || '').trim();
     const email = String(formData.get('email') || '').trim().toLowerCase();
@@ -315,27 +344,30 @@ const next = Astro.url.searchParams.get('next') || '/admin/index.html';
       return;
     }
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-      localStorage.setItem(
-        'newshubAuth',
-        JSON.stringify({
-          email,
-          name: 'NewsHub Admin',
-          role: 'admin',
-          signedInAt: new Date().toISOString(),
-        }),
-      );
-      window.location.href = nextUrl;
+    setBusy(signupForm, true);
+    const { data, error: signUpError } = await supabaseBrowser.auth.signUp({
+      email,
+      password,
+      options: { data: { name } },
+    });
+    setBusy(signupForm, false);
+
+    if (signUpError) {
+      const msg = /already registered|exists/i.test(signUpError.message)
+        ? 'Email này đã có tài khoản. Bạn hãy đăng nhập.'
+        : 'Không tạo được tài khoản: ' + signUpError.message;
+      showSignupMessage(msg, 'error');
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem('newshubUsers') || '[]');
-    const nextUsers = [
-      ...users.filter((user: { email?: string }) => user.email !== email),
-      { name, email, role: 'member', createdAt: new Date().toISOString() },
-    ];
-    localStorage.setItem('newshubUsers', JSON.stringify(nextUsers));
-    showSignupMessage('Đăng kí thành công. Bạn có thể quay lại form đăng nhập.', 'success');
-    signupForm.reset();
+    if (data.session) {
+      // Xác nhận email đang tắt → đã đăng nhập luôn.
+      const user = await getCurrentUser();
+      redirectAfterAuth(user?.role || 'user');
+    } else {
+      // Xác nhận email đang bật → cần bấm link trong email.
+      showSignupMessage('Đăng ký thành công. Vui lòng kiểm tra email để xác nhận rồi đăng nhập.', 'success');
+      signupForm.reset();
+    }
   });
 </script>
