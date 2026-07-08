@@ -1,13 +1,555 @@
 <!doctype html>
-<html lang="vi">
+<html lang="vi" class="checking-auth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
-    <title>NewsHub — Quản trị nội dung</title>
+    <title>NewsHub - Admin</title>
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      (function () {
+        try {
+          var auth = JSON.parse(localStorage.getItem('newshubAuth') || 'null');
+          if (!auth || auth.role !== 'admin' || auth.email !== 'admin@newshub.com') {
+            window.location.replace('/login?next=/admin/index.html');
+          }
+        } catch (error) {
+          window.location.replace('/login?next=/admin/index.html');
+        }
+      })();
+    </script>
+    <style>
+      :root {
+        --dark: #0b1020;
+        --dark-soft: #131b2e;
+        --cyan: #22d3ee;
+        --purple: #4648d4;
+        --bg: #f7f9fb;
+        --surface: #ffffff;
+        --surface-low: #f2f4f6;
+        --text: #191c1e;
+        --muted: #76777d;
+        --border: #e2e8f0;
+        --border-strong: #c6c6cd;
+        --grad: linear-gradient(135deg, #22d3ee 0%, #4648d4 100%);
+        --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-head: 'Be Vietnam Pro', 'Inter', sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html.checking-auth body {
+        visibility: hidden;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font-body);
+        color: var(--text);
+        background: var(--bg);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+      .admin-app {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+      .sidebar {
+        background: var(--dark);
+        color: #dbeafe;
+        padding: 24px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+      .brand {
+        display: grid;
+        gap: 14px;
+      }
+      .brand img {
+        width: 190px;
+        height: auto;
+      }
+      .brand span {
+        color: #94a3b8;
+        font-size: 0.86rem;
+      }
+      .nav {
+        display: grid;
+        gap: 6px;
+      }
+      .nav a,
+      .logout {
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-radius: 8px;
+        padding: 0 12px;
+        color: #cbd5e1;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        text-align: left;
+      }
+      .nav a.active,
+      .nav a:hover,
+      .logout:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      .logout {
+        margin-top: auto;
+        width: 100%;
+      }
+      .main {
+        min-width: 0;
+        display: grid;
+        grid-template-rows: auto 1fr;
+      }
+      .topbar {
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 16px 28px;
+        background: rgba(255, 255, 255, 0.9);
+        border-bottom: 1px solid var(--border);
+        backdrop-filter: blur(14px);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+      .topbar h1 {
+        margin: 0;
+        font-family: var(--font-head);
+        font-size: clamp(1.25rem, 2vw, 1.8rem);
+      }
+      .admin-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+      .avatar {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 8px;
+        background: var(--grad);
+        color: #fff;
+        font-family: var(--font-head);
+        font-weight: 800;
+      }
+      .content {
+        padding: 28px;
+        display: grid;
+        gap: 24px;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 18px;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+      }
+      .stat span {
+        color: var(--muted);
+        font-size: 0.82rem;
+        font-weight: 700;
+      }
+      .stat strong {
+        display: block;
+        margin-top: 8px;
+        font-family: var(--font-head);
+        font-size: 2rem;
+        line-height: 1;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
+        gap: 18px;
+        align-items: start;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+        overflow: hidden;
+      }
+      .panel-head {
+        min-height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+      .panel-head h2 {
+        margin: 0;
+        font-family: var(--font-head);
+        font-size: 1.08rem;
+      }
+      .panel-head a {
+        color: var(--purple);
+        font-weight: 800;
+        font-size: 0.86rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        vertical-align: top;
+      }
+      th {
+        color: var(--muted);
+        font-size: 0.76rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      td {
+        font-size: 0.92rem;
+      }
+      .title-cell {
+        font-weight: 800;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        border-radius: 999px;
+        padding: 0 9px;
+        background: rgba(70, 72, 212, 0.1);
+        color: var(--purple);
+        font-size: 0.78rem;
+        font-weight: 800;
+      }
+      .quick-form {
+        padding: 18px;
+        display: grid;
+        gap: 14px;
+      }
+      label {
+        display: grid;
+        gap: 7px;
+        color: var(--muted);
+        font-size: 0.84rem;
+        font-weight: 800;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 11px 12px;
+        background: #fff;
+        color: var(--text);
+      }
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+      .primary {
+        min-height: 44px;
+        border: 0;
+        border-radius: 8px;
+        background: #000;
+        color: #fff;
+        font-family: var(--font-head);
+        font-weight: 800;
+        cursor: pointer;
+      }
+      .notice {
+        margin: 0;
+        color: #166534;
+        background: #dcfce7;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 0.88rem;
+      }
+      .draft-list {
+        display: grid;
+        gap: 10px;
+        padding: 0 18px 18px;
+      }
+      .draft {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        background: var(--surface-low);
+      }
+      .draft strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .draft span {
+        color: var(--muted);
+        font-size: 0.84rem;
+      }
+
+      @media (max-width: 980px) {
+        .admin-app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: static;
+        }
+        .grid,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 620px) {
+        .topbar,
+        .content {
+          padding-inline: 16px;
+        }
+        th:nth-child(3),
+        td:nth-child(3) {
+          display: none;
+        }
+      }
+    </style>
   </head>
   <body>
-    <!-- Decap CMS admin UI -->
-    <script src="https://unpkg.com/decap-cms@^3.8.0/dist/decap-cms.js"></script>
+    <div class="admin-app">
+      <aside class="sidebar">
+        <a class="brand" href="/">
+          <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="190" height="40" />
+          <span>Bảng điều khiển quản trị</span>
+        </a>
+        <nav class="nav" aria-label="Admin">
+          <a href="/admin/index.html" class="active">Dashboard</a>
+          <a href="/">Xem website</a>
+          <a href="/search">Tìm bài viết</a>
+          <a href="/rss.xml">RSS</a>
+        </nav>
+        <button class="logout" type="button" id="logoutButton">Đăng xuất</button>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <h1>Dashboard</h1>
+          <div class="admin-user">
+            <span id="adminEmail">admin@newshub.com</span>
+            <span class="avatar" aria-hidden="true">A</span>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="stats" aria-label="Thống kê">
+            <article class="stat">
+              <span>Bài viết</span>
+              <strong id="postCount">0</strong>
+            </article>
+            <article class="stat">
+              <span>Nháp demo</span>
+              <strong id="draftCount">0</strong>
+            </article>
+            <article class="stat">
+              <span>Tài khoản</span>
+              <strong id="userCount">1</strong>
+            </article>
+            <article class="stat">
+              <span>Trạng thái</span>
+              <strong>Live</strong>
+            </article>
+          </div>
+
+          <div class="grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Bài viết gần đây</h2>
+                <a href="/search">Xem tất cả</a>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Tiêu đề</th>
+                    <th>Chuyên mục</th>
+                    <th>Ngày</th>
+                    <th>Trạng thái</th>
+                  </tr>
+                </thead>
+                <tbody id="postTable">
+                  <tr>
+                    <td colspan="4">Đang tải dữ liệu...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Tạo nháp nhanh</h2>
+              </div>
+              <form class="quick-form" id="draftForm">
+                <label>
+                  Tiêu đề
+                  <input name="title" placeholder="Nhập tiêu đề bài viết" required />
+                </label>
+                <label>
+                  Chuyên mục
+                  <select name="category">
+                    <option>AI</option>
+                    <option>Thiết bị</option>
+                    <option>Startup</option>
+                    <option>An ninh mạng</option>
+                    <option>Lập trình</option>
+                    <option>Cloud</option>
+                    <option>Đánh giá</option>
+                  </select>
+                </label>
+                <label>
+                  Ghi chú
+                  <textarea name="note" placeholder="Ý chính, nguồn, deadline..."></textarea>
+                </label>
+                <p class="notice" id="draftNotice" hidden>Đã lưu nháp vào trình duyệt.</p>
+                <button class="primary" type="submit">Lưu nháp</button>
+              </form>
+              <div class="draft-list" id="draftList"></div>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script>
+      var auth = JSON.parse(localStorage.getItem('newshubAuth') || 'null');
+      document.documentElement.classList.remove('checking-auth');
+      document.getElementById('adminEmail').textContent = auth && auth.email ? auth.email : 'admin@newshub.com';
+
+      document.getElementById('logoutButton').addEventListener('click', function () {
+        localStorage.removeItem('newshubAuth');
+        window.location.href = '/login';
+      });
+
+      function getDrafts() {
+        return JSON.parse(localStorage.getItem('newshubDrafts') || '[]');
+      }
+
+      function setDrafts(drafts) {
+        localStorage.setItem('newshubDrafts', JSON.stringify(drafts));
+      }
+
+      function renderDrafts() {
+        var drafts = getDrafts();
+        var list = document.getElementById('draftList');
+        document.getElementById('draftCount').textContent = String(drafts.length);
+        list.innerHTML = '';
+
+        drafts.slice(0, 4).forEach(function (draft) {
+          var item = document.createElement('article');
+          item.className = 'draft';
+          var title = document.createElement('strong');
+          title.textContent = draft.title;
+          var meta = document.createElement('span');
+          meta.textContent = draft.category + ' - ' + new Date(draft.createdAt).toLocaleDateString('vi-VN');
+          item.append(title, meta);
+          list.append(item);
+        });
+      }
+
+      function renderPosts(items) {
+        var table = document.getElementById('postTable');
+        table.innerHTML = '';
+        document.getElementById('postCount').textContent = String(items.length);
+
+        items.slice(0, 8).forEach(function (item) {
+          var row = document.createElement('tr');
+          var title = document.createElement('td');
+          var category = document.createElement('td');
+          var date = document.createElement('td');
+          var status = document.createElement('td');
+          var pill = document.createElement('span');
+
+          title.className = 'title-cell';
+          title.textContent = item.title;
+          category.textContent = item.category || 'NewsHub';
+          date.textContent = item.date || '-';
+          pill.className = 'pill';
+          pill.textContent = 'Đã đăng';
+          status.append(pill);
+          row.append(title, category, date, status);
+          table.append(row);
+        });
+      }
+
+      async function loadPosts() {
+        try {
+          var response = await fetch('/rss.xml', { cache: 'no-store' });
+          var xml = await response.text();
+          var doc = new DOMParser().parseFromString(xml, 'application/xml');
+          var items = Array.from(doc.querySelectorAll('item')).map(function (item) {
+            return {
+              title: item.querySelector('title')?.textContent || 'Bài viết NewsHub',
+              category: item.querySelector('category')?.textContent || 'NewsHub',
+              date: item.querySelector('pubDate')?.textContent
+                ? new Date(item.querySelector('pubDate').textContent).toLocaleDateString('vi-VN')
+                : '',
+            };
+          });
+          renderPosts(items);
+        } catch (error) {
+          renderPosts([
+            { title: 'Mô hình AI thế hệ mới đẩy khả năng suy luận lên tầm cao mới', category: 'AI', date: '07/07/2026' },
+            { title: 'AI agent: khi trợ lý biết tự lên kế hoạch và hành động', category: 'AI', date: '06/07/2026' },
+            { title: 'Cuộc đua chip AI: khi phần cứng quyết định tốc độ đổi mới', category: 'AI', date: '05/07/2026' },
+          ]);
+        }
+      }
+
+      document.getElementById('draftForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        var data = new FormData(event.currentTarget);
+        var draft = {
+          title: String(data.get('title') || '').trim(),
+          category: String(data.get('category') || 'NewsHub'),
+          note: String(data.get('note') || '').trim(),
+          createdAt: new Date().toISOString(),
+        };
+        if (!draft.title) return;
+        setDrafts([draft].concat(getDrafts()).slice(0, 12));
+        event.currentTarget.reset();
+        document.getElementById('draftNotice').hidden = false;
+        renderDrafts();
+      });
+
+      var users = JSON.parse(localStorage.getItem('newshubUsers') || '[]');
+      document.getElementById('userCount').textContent = String(users.length + 1);
+      renderDrafts();
+      loadPosts();
+    </script>
   </body>
 </html>

@@ -7,7 +7,7 @@ import SearchBox from './SearchBox.astro';
   <div class="container header-inner">
     <div class="header-left">
       <a href="/" class="logo" aria-label="NewsHub - Trang chủ">
-        <img src="/assets/newshub-icon.png" alt="NewsHub" width="44" height="44" />
+        <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="170" height="36" />
       </a>
 
       <div class="header-search">
@@ -17,8 +17,8 @@ import SearchBox from './SearchBox.astro';
 
     <div class="header-right">
       <div class="auth-actions" aria-label="Tài khoản">
-        <a href="/admin/" class="auth-login">Đăng nhập</a>
-        <a href="/admin/" class="auth-signup">Đăng ký</a>
+        <a href="/login" class="auth-login" data-auth-login>Đăng nhập</a>
+        <a href="/signup" class="auth-signup" data-auth-signup>Đăng ký</a>
       </div>
       <button
         class="nav-toggle"
@@ -77,8 +77,8 @@ import SearchBox from './SearchBox.astro';
   }
   .logo img {
     display: block;
-    width: 44px;
-    height: 44px;
+    width: clamp(138px, 14vw, 170px);
+    height: 36px;
     object-fit: contain;
   }
   .header-search {
@@ -203,4 +203,19 @@ import SearchBox from './SearchBox.astro';
     toggle.setAttribute('aria-label', open ? 'Mở menu' : 'Đóng menu');
     if (drawer) drawer.hidden = open;
   });
+
+  const loginLink = document.querySelector<HTMLAnchorElement>('[data-auth-login]');
+  const signupLink = document.querySelector<HTMLAnchorElement>('[data-auth-signup]');
+  const auth = localStorage.getItem('newshubAuth');
+  if (auth && loginLink && signupLink) {
+    loginLink.href = '/admin/index.html';
+    loginLink.textContent = 'Admin';
+    signupLink.href = '#logout';
+    signupLink.textContent = 'Đăng xuất';
+    signupLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      localStorage.removeItem('newshubAuth');
+      window.location.href = '/login';
+    });
+  }
 </script>

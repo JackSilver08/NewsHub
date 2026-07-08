@@ -1,0 +1,251 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Đăng ký"
+  description="Tạo tài khoản NewsHub để theo dõi và chuẩn bị truy cập khu vực quản trị."
+>
+  <section class="signup-page">
+    <div class="signup-shell">
+      <div class="signup-panel">
+        <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="200" height="42" />
+        <h1>Tạo tài khoản NewsHub</h1>
+        <p>Tài khoản đăng ký được lưu trên trình duyệt để demo giao diện. Quyền quản trị vẫn dùng tài khoản admin đã set cứng.</p>
+      </div>
+
+      <form class="signup-card" id="signupForm" novalidate>
+        <div class="form-head">
+          <span>Tài khoản mới</span>
+          <h2>Đăng ký</h2>
+        </div>
+
+        <label>
+          Họ tên
+          <input type="text" name="name" autocomplete="name" placeholder="Tên của bạn" required />
+        </label>
+
+        <label>
+          Email
+          <input type="email" name="email" autocomplete="email" placeholder="you@example.com" required />
+        </label>
+
+        <label>
+          Mật khẩu
+          <input
+            type="password"
+            name="password"
+            autocomplete="new-password"
+            placeholder="Tối thiểu 6 ký tự"
+            minlength="6"
+            required
+          />
+        </label>
+
+        <p class="form-message" id="signupMessage" hidden></p>
+
+        <button type="submit">Tạo tài khoản</button>
+        <p class="form-note">Đã có tài khoản? <a href="/login">Đăng nhập</a></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .signup-page {
+    min-height: calc(100vh - 64px);
+    display: grid;
+    place-items: center;
+    padding: 48px 20px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(247, 249, 251, 0.96)),
+      radial-gradient(circle at 18% 18%, rgba(34, 211, 238, 0.2), transparent 36%),
+      radial-gradient(circle at 86% 22%, rgba(139, 92, 246, 0.22), transparent 34%);
+  }
+  .signup-shell {
+    width: min(100%, 1020px);
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) 430px;
+    gap: 28px;
+    align-items: stretch;
+  }
+  .signup-panel {
+    border-radius: 8px;
+    background: #0b1020;
+    color: #fff;
+    padding: 34px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 520px;
+    overflow: hidden;
+    position: relative;
+  }
+  .signup-panel::before {
+    content: '';
+    position: absolute;
+    inset: -30% -20% auto auto;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle, rgba(34, 211, 238, 0.34), transparent 62%);
+  }
+  .signup-panel img,
+  .signup-panel h1,
+  .signup-panel p {
+    position: relative;
+  }
+  .signup-panel img {
+    width: min(270px, 72vw);
+    height: auto;
+    margin-bottom: auto;
+  }
+  .signup-panel h1 {
+    color: #fff;
+    font-size: clamp(2.1rem, 5vw, 4rem);
+    line-height: 1;
+    max-width: 10ch;
+  }
+  .signup-panel p {
+    color: #dbeafe;
+    max-width: 48ch;
+    margin: 0;
+  }
+  .signup-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-hover);
+    padding: 28px;
+    display: grid;
+    gap: 18px;
+    align-content: center;
+  }
+  .form-head span {
+    display: inline-flex;
+    color: var(--nh-purple);
+    font-family: var(--font-head);
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .form-head h2 {
+    margin: 0;
+    font-size: 1.55rem;
+  }
+  label {
+    display: grid;
+    gap: 8px;
+    color: var(--text-soft);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+  input {
+    width: 100%;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 13px 14px;
+    font: inherit;
+    color: var(--text);
+    background: var(--surface);
+  }
+  input:focus {
+    outline: 2px solid var(--ring);
+    border-color: var(--nh-purple);
+  }
+  button {
+    min-height: 46px;
+    border: 0;
+    border-radius: 8px;
+    background: #000;
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 0.95rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .form-message {
+    margin: 0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  .form-message.success {
+    color: #166534;
+    background: #dcfce7;
+  }
+  .form-message.error {
+    color: #b91c1c;
+    background: #fee2e2;
+  }
+  .form-note {
+    margin: 0;
+    color: var(--text-muted);
+    text-align: center;
+    font-size: 0.92rem;
+  }
+  .form-note a {
+    color: var(--nh-purple);
+    font-weight: 800;
+  }
+
+  @media (max-width: 840px) {
+    .signup-shell {
+      grid-template-columns: 1fr;
+    }
+    .signup-panel {
+      min-height: 340px;
+    }
+  }
+</style>
+
+<script>
+  const ADMIN_EMAIL = 'admin@newshub.com';
+  const ADMIN_PASSWORD = 'admin@1234';
+  const form = document.querySelector<HTMLFormElement>('#signupForm');
+  const message = document.querySelector<HTMLElement>('#signupMessage');
+
+  function showMessage(text: string, type: 'success' | 'error') {
+    if (!message) return;
+    message.textContent = text;
+    message.className = `form-message ${type}`;
+    message.hidden = false;
+  }
+
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const formData = new FormData(form);
+    const name = String(formData.get('name') || '').trim();
+    const email = String(formData.get('email') || '').trim().toLowerCase();
+    const password = String(formData.get('password') || '');
+
+    if (!name || !email || password.length < 6) {
+      showMessage('Vui lòng nhập đủ thông tin và mật khẩu tối thiểu 6 ký tự.', 'error');
+      return;
+    }
+
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      localStorage.setItem(
+        'newshubAuth',
+        JSON.stringify({
+          email,
+          name: 'NewsHub Admin',
+          role: 'admin',
+          signedInAt: new Date().toISOString(),
+        }),
+      );
+      window.location.href = '/admin/index.html';
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('newshubUsers') || '[]');
+    const nextUsers = [
+      ...users.filter((user: { email?: string }) => user.email !== email),
+      { name, email, role: 'member', createdAt: new Date().toISOString() },
+    ];
+    localStorage.setItem('newshubUsers', JSON.stringify(nextUsers));
+    showMessage('Đăng ký thành công. Dùng tài khoản admin đã set cứng để vào trang quản trị.', 'success');
+    form.reset();
+  });
+</script>
