@@ -1,0 +1,40 @@
+-- ============================================================
+-- NewsHub — Hẹn giờ gửi bản tin hàng tuần bằng pg_cron + pg_net
+--
+-- ĐÂY LÀ FILE MẪU (.template). Nó chứa CRON_SECRET nên KHÔNG commit bản
+-- đã điền. Cách dùng:
+--   1. Thay 2 chỗ <...> bên dưới.
+--   2. Dán vào Supabase SQL Editor và Run (một lần).
+--   3. Xoá nội dung đã điền, KHÔNG lưu lại vào repo.
+--
+-- Lịch: '0 0 * * 1' = 00:00 UTC Thứ Hai = 07:00 sáng giờ VN (UTC+7).
+-- ============================================================
+
+-- Bật extension (Supabase có sẵn, chỉ cần enable một lần).
+create extension if not exists pg_cron;
+create extension if not exists pg_net;
+
+-- Gỡ job cũ nếu chạy lại script (tránh trùng lịch).
+select cron.unschedule('newsletter-weekly')
+where exists (select 1 from cron.job where jobname = 'newsletter-weekly');
+
+-- Hẹn lịch: mỗi sáng Thứ Hai gọi edge function send-newsletter.
+select cron.schedule(
+  'newsletter-weekly',
+  '0 0 * * 1',
+  $$
+  select net.http_post(
+    url     := 'https://<PROJECT_REF>.supabase.co/functions/v1/send-newsletter',
+    headers := jsonb_build_object(
+      'content-type', 'application/json',
+      'x-cron-secret', '<CRON_SECRET>'
+    ),
+    body    := jsonb_build_object('days', 7)
+  );
+  $$
+);
+
+-- Kiểm tra job đã tạo:
+--   select jobname, schedule, active from cron.job;
+-- Xem lịch sử chạy:
+--   select * from cron.job_run_details order by start_time desc limit 10;

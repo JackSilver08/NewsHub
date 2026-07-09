@@ -1,0 +1,13 @@
+# Cấu hình Supabase CLI cho NewsHub.
+# project_id = project ref (lấy trong URL dashboard: /project/<ref>).
+project_id = "mfwnayxisdsmlppywjir"
+
+# ── Edge Functions ──────────────────────────────────────────────
+# Cả hai đều tự kiểm tra quyền bên trong (send-newsletter dùng x-cron-secret;
+# unsubscribe là endpoint công khai theo token) nên tắt verify_jwt để pg_cron
+# và link trong email gọi được mà không cần JWT của Supabase.
+[functions.send-newsletter]
+verify_jwt = false
+
+[functions.unsubscribe]
+verify_jwt = false
