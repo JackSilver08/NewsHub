@@ -35,11 +35,19 @@ const year = new Date().getFullYear();
     <div class="footer-col footer-newsletter">
       <h2>Bản tin định kỳ</h2>
       <p>Nhận tóm tắt tin tức công nghệ hàng đầu trực tiếp vào email của bạn mỗi sáng.</p>
-      <form action="/search" method="get">
+      <form data-newsletter novalidate>
         <label class="visually-hidden" for="footer-email">Email của bạn</label>
-        <input id="footer-email" name="q" type="email" placeholder="Email của bạn" />
-        <button type="submit">Gửi</button>
+        <input
+          id="footer-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="Email của bạn"
+          required
+        />
+        <button type="submit" data-submit>Gửi</button>
       </form>
+      <p class="newsletter-status" data-status hidden role="status" aria-live="polite"></p>
     </div>
   </div>
 
@@ -117,6 +125,21 @@ const year = new Date().getFullYear();
     padding: 0 14px;
     cursor: pointer;
   }
+  .footer-newsletter button:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .newsletter-status {
+    margin: 10px 0 0;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+  .newsletter-status.is-ok {
+    color: var(--nh-cyan);
+  }
+  .newsletter-status.is-error {
+    color: #fca5a5;
+  }
   .footer-col a:hover {
     color: var(--nh-cyan);
   }
@@ -138,3 +161,61 @@ const year = new Date().getFullYear();
     }
   }
 </style>
+
+<script>
+  import { supabaseBrowser, supabaseConfigured } from '../lib/supabaseBrowser';
+
+  const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+
+  document.querySelectorAll<HTMLFormElement>('form[data-newsletter]').forEach((form) => {
+    const input = form.querySelector<HTMLInputElement>('input[name="email"]')!;
+    const button = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const status = form.parentElement!.querySelector<HTMLElement>('[data-status]')!;
+
+    function show(message: string, ok: boolean) {
+      status.textContent = message;
+      status.classList.toggle('is-ok', ok);
+      status.classList.toggle('is-error', !ok);
+      status.hidden = false;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const email = input.value.trim();
+      if (!EMAIL_RE.test(email)) {
+        show('Email chưa hợp lệ, bạn kiểm tra lại nhé.', false);
+        input.focus();
+        return;
+      }
+
+      if (!supabaseConfigured) {
+        show('Chức năng đăng ký chưa được cấu hình.', false);
+        return;
+      }
+
+      button.disabled = true;
+      status.hidden = true;
+
+      const { error } = await supabaseBrowser
+        .from('newsletter_subscribers')
+        .insert({ email, source: 'footer' });
+
+      button.disabled = false;
+
+      if (error) {
+        // 23505 = trùng khóa (email đã đăng ký trước đó).
+        if (error.code === '23505') {
+          show('Email này đã đăng ký rồi — cảm ơn bạn!', true);
+          form.reset();
+        } else {
+          show('Đăng ký chưa được, bạn thử lại sau nhé.', false);
+        }
+        return;
+      }
+
+      show('Đã đăng ký! Kiểm tra hộp thư mỗi sáng nhé. 📬', true);
+      form.reset();
+    });
+  });
+</script>
