@@ -6,8 +6,13 @@ import SearchBox from './SearchBox.astro';
 <header class="site-header">
   <div class="container header-inner">
     <div class="header-left">
-      <a href="/" class="logo" aria-label="NewsHub - Trang chủ">
-        <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="170" height="36" />
+      <a href="/" class="logo" aria-label="Công Nghệ Thường Nhật - Trang chủ">
+        <img
+          src="/assets/cong-nghe-thuong-nhat-logo.png"
+          alt="Công Nghệ Thường Nhật"
+          width="190"
+          height="70"
+        />
       </a>
 
       <div class="header-search">
@@ -118,9 +123,10 @@ import SearchBox from './SearchBox.astro';
   }
   .logo img {
     display: block;
-    width: clamp(138px, 14vw, 170px);
-    height: 36px;
+    width: clamp(142px, 15vw, 190px);
+    height: 48px;
     object-fit: contain;
+    object-position: left center;
   }
   .header-search {
     flex: 0 1 360px;

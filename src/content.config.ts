@@ -28,7 +28,7 @@ const posts = defineCollection({
     excerpt: z.string(),
     category: z.enum(CATEGORIES),
     tags: z.array(z.string()).default([]),
-    author: z.string().default('Ban Biên tập NewsHub'),
+    author: z.string().default('Ban Biên tập Công Nghệ Thường Nhật'),
     publishedAt: z.coerce.date(),
     updatedAt: z.coerce.date().optional(),
     readingTime: z.number().int().positive().optional(),

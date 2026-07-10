@@ -16,14 +16,14 @@ export interface Props {
 
 const {
   title,
-  description = 'NewsHub cập nhật tin tức công nghệ, AI, startup, thiết bị và an ninh mạng mới nhất trong ngày.',
+  description = 'Công Nghệ Thường Nhật cập nhật tin công nghệ, AI, thiết bị và an toàn số dễ hiểu mỗi ngày.',
   image = '/assets/post-hero.png',
   type = 'website',
   jsonLd,
   appendSiteName = true,
 } = Astro.props;
 
-const siteName = 'NewsHub';
+const siteName = 'Công Nghệ Thường Nhật';
 const fullTitle = appendSiteName ? `${title} · ${siteName}` : title;
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
 const ogImage = new URL(image, Astro.site).toString();
@@ -45,9 +45,9 @@ const ogImage = new URL(image, Astro.site).toString();
       } catch (e) {}
     </script>
     <link rel="icon" href="/favicon.png" type="image/png" />
-    <link rel="apple-touch-icon" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" type="application/rss+xml" title="NewsHub RSS" href="/rss.xml" />
+    <link rel="alternate" type="application/rss+xml" title="Công Nghệ Thường Nhật RSS" href="/rss.xml" />
 
     <title>{fullTitle}</title>
     <meta name="description" content={description} />

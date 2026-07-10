@@ -1,4 +1,4 @@
-# Decap CMS configuration for NewsHub
+# Decap CMS configuration for Công Nghệ Thường Nhật
 # Docs: https://decapcms.org/docs/
 
 backend:
@@ -79,7 +79,7 @@ collections:
           name: "author",
           label: "Tác giả",
           widget: "string",
-          default: "Ban Biên tập NewsHub",
+          default: "Ban Biên tập Công Nghệ Thường Nhật",
         }
       - {
           name: "publishedAt",

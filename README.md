@@ -1,4 +1,4 @@
-# NewsHub
+# Công Nghệ Thường Nhật
 
 Static news portal về công nghệ / AI, xây bằng **Astro + Content Collections + Decap CMS**, deploy trên **Vercel**. Không cần backend/database ở v1 — tất cả bài viết là file Markdown trong repo.
 

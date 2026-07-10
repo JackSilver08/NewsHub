@@ -5,7 +5,7 @@ import { getPublishedPosts, postSlug } from '../lib/posts';
 export async function GET(context: APIContext) {
   const posts = await getPublishedPosts();
   return rss({
-    title: 'NewsHub — Tin công nghệ và AI',
+    title: 'Công Nghệ Thường Nhật — Tin công nghệ và AI',
     description:
       'Cập nhật tin tức công nghệ, AI, startup, thiết bị và an ninh mạng mới nhất.',
     site: context.site ?? 'https://newshub.vercel.app',

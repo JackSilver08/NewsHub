@@ -6,7 +6,14 @@ const year = new Date().getFullYear();
 <footer class="site-footer">
   <div class="container footer-inner">
     <div class="footer-brand">
-      <img src="/assets/newshub-logo-white.png" alt="NewsHub" width="150" height="36" class="footer-logo" />
+      <a href="/" class="footer-logo" aria-label="Công Nghệ Thường Nhật - Trang chủ">
+        <img
+          src="/assets/cong-nghe-thuong-nhat-logo-white.png"
+          alt="Công Nghệ Thường Nhật"
+          width="210"
+          height="78"
+        />
+      </a>
       <p>
         Tin tức công nghệ, AI, startup và an ninh mạng — cập nhật nhanh, chọn lọc và dễ đọc.
       </p>
@@ -22,7 +29,7 @@ const year = new Date().getFullYear();
     </nav>
 
     <nav class="footer-col" aria-label="Liên kết">
-      <h2>NewsHub</h2>
+      <h2>Thường Nhật</h2>
       <ul>
         <li><a href="/">Trang chủ</a></li>
         <li><a href="/search">Tìm kiếm</a></li>
@@ -53,7 +60,7 @@ const year = new Date().getFullYear();
 
   <div class="footer-bottom">
     <div class="container">
-      <p>© {year} NewsHub. Dự án minh hoạ — nội dung mang tính tham khảo.</p>
+      <p>© {year} Công Nghệ Thường Nhật. Hiểu công nghệ, sống tốt hơn.</p>
     </div>
   </div>
 </footer>
@@ -71,9 +78,15 @@ const year = new Date().getFullYear();
     padding-block: 48px 32px;
   }
   .footer-logo {
-    height: 34px;
-    width: auto;
+    display: inline-flex;
+    align-items: center;
     margin-bottom: 14px;
+  }
+  .footer-logo img {
+    width: min(210px, 100%);
+    height: 78px;
+    object-fit: contain;
+    object-position: left center;
   }
   .footer-brand p {
     max-width: 42ch;

@@ -107,7 +107,7 @@ async function getSupabasePublishedPosts(): Promise<SupabasePost[]> {
         excerpt: String(row.excerpt || ''),
         category: String(row.category || 'ai'),
         tags: Array.isArray(row.tags) ? row.tags : [],
-        author: String(row.author || 'NewsHub Admin'),
+        author: String(row.author || 'Thường Nhật Admin'),
         publishedAt,
         updatedAt: row.updated_at ? toDate(row.updated_at) : undefined,
         readingTime: estimateReadingTime(body),
