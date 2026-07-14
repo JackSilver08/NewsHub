@@ -26,3 +26,11 @@ yarn-error.log*
 Thumbs.db
 .vscode/*
 !.vscode/extensions.json
+
+# AI Image Factory runtime
+services/image-factory/.env
+services/image-factory/backend/.venv/
+services/image-factory/storage/
+
+# Source repository kept locally only; the integrated service lives above.
+Gen Img Tool/

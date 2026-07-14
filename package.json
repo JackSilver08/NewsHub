@@ -9,7 +9,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "cms": "npx decap-server"
+    "cms": "npx decap-server",
+    "image-service": "powershell -ExecutionPolicy Bypass -File ./services/image-factory/scripts/start.ps1"
   },
   "dependencies": {
     "@astrojs/rss": "^4.0.19",
