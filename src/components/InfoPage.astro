@@ -1,0 +1,77 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  updated?: string;
+}
+
+const { eyebrow = 'Công Nghệ Thường Nhật', title, description, updated } = Astro.props;
+---
+
+<header class="info-hero">
+  <span>{eyebrow}</span>
+  <h1>{title}</h1>
+  <p>{description}</p>
+  {updated && <small>Cập nhật lần cuối: {updated}</small>}
+</header>
+
+<article class="info-content">
+  <slot />
+</article>
+
+<style>
+  .info-hero,
+  .info-content {
+    width: min(820px, calc(100% - 40px));
+    margin-inline: auto;
+  }
+  .info-hero {
+    padding: 64px 0 34px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-hero span {
+    color: var(--nh-purple);
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.78rem;
+  }
+  .info-hero h1 {
+    margin: 10px 0 14px;
+    font-size: clamp(2rem, 6vw, 3.35rem);
+  }
+  .info-hero p {
+    max-width: 65ch;
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 1.06rem;
+  }
+  .info-hero small {
+    display: block;
+    margin-top: 16px;
+    color: var(--text-muted);
+  }
+  .info-content {
+    padding: 36px 0 72px;
+  }
+  .info-content :global(h2) {
+    margin-top: 34px;
+    font-size: 1.35rem;
+  }
+  .info-content :global(h2:first-child) {
+    margin-top: 0;
+  }
+  .info-content :global(p),
+  .info-content :global(li) {
+    color: var(--text-soft);
+  }
+  .info-content :global(a) {
+    color: var(--nh-purple);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .info-content :global(li + li) {
+    margin-top: 8px;
+  }
+</style>
