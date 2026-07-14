@@ -17,6 +17,24 @@ logger = get_logger(__name__)
 
 
 _SUBJECT_RULES: list[tuple[tuple[str, ...], dict]] = [
+    (("cloud", "kubernetes", "k8s", "server", "data center", "du lieu dam may", "ha tang"), {
+        "subject": "a row of modern enterprise server racks as the clear hero subject",
+        "objects": ["real network switches", "organized fiber cables", "status lights", "cooling infrastructure"],
+        "environment": "a clean contemporary hyperscale data center with believable engineering details",
+        "action": "operating as a connected cloud computing cluster with subtle active status lights",
+    }),
+    (("an ninh mang", "bao mat", "malware", "ransomware", "zero trust"), {
+        "subject": "a professional cybersecurity operations workstation as the clear hero subject",
+        "objects": ["multiple security monitoring displays", "network hardware", "analyst keyboard", "server rack"],
+        "environment": "a realistic modern security operations center",
+        "action": "monitoring a live enterprise network for credible security threats",
+    }),
+    (("database", "co so du lieu", "sql", "postgres", "du lieu"), {
+        "subject": "modern enterprise database servers as the clear physical hero subject",
+        "objects": ["organized server racks", "storage arrays", "network switches", "subtle status lights"],
+        "environment": "a realistic contemporary data infrastructure facility",
+        "action": "processing and replicating business data across connected systems",
+    }),
     (("may tinh", "cong nghe", "phan mem", "ai", "laptop", "internet"), {
         "subject": "a Vietnamese professional actively working at a modern desktop computer",
         "objects": ["desktop monitor", "keyboard", "smartphone", "notebook"],
@@ -264,7 +282,7 @@ def canvas_profile(aspect_ratio: str, quality_profile: str, model: str) -> tuple
         # SD-Turbo reaches its useful quality range quickly. Two steps keeps
         # 768px editorial thumbnails fast on CPU; publish gets one refinement
         # step without doubling generation time.
-        steps = 3 if quality_profile == "publish" else 2
+        steps = 2 if quality_profile == "draft" else 3
         cfg = 1.0
     else:
         steps = {"draft": 18, "standard": 25, "publish": 30}[quality_profile]
