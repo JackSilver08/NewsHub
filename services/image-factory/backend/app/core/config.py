@@ -52,7 +52,8 @@ class Settings(BaseSettings):
     # Comma separated list of allowed CORS origins for the Vue dev server.
     cors_origins: str = (
         "http://localhost:5173,http://127.0.0.1:5173,"
-        "http://localhost:4321,http://127.0.0.1:4321"
+        "http://localhost:4321,http://127.0.0.1:4321,"
+        "https://newshub-jack.netlify.app"
     )
 
     # --- Paths ---
