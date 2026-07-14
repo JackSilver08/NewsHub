@@ -968,8 +968,8 @@
       <section class="modal" role="dialog" aria-modal="true" aria-labelledby="editUserTitle">
         <div class="modal-head">
           <div>
-            <h2 id="editUserTitle">Sửa vai trò</h2>
-            <p>Đổi họ tên hiển thị và vai trò của tài khoản.</p>
+            <h2 id="editUserTitle">Đổi mật khẩu</h2>
+            <p>Đặt mật khẩu đăng nhập mới cho tài khoản.</p>
           </div>
           <button class="modal-close" type="button" data-close-modal aria-label="Đóng">×</button>
         </div>
@@ -987,21 +987,18 @@
               </div>
             </div>
             <label>
-              Họ tên
-              <input name="name" required />
+              Mật khẩu mới
+              <input name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required />
             </label>
             <label>
-              Vai trò
-              <select name="role">
-                <option value="user">Người dùng</option>
-                <option value="moderator">Moderator</option>
-              </select>
+              Nhập lại mật khẩu
+              <input name="passwordConfirm" type="password" minlength="8" maxlength="72" autocomplete="new-password" required />
             </label>
             <p class="notice" id="editUserNotice" hidden></p>
           </div>
           <div class="modal-actions">
             <button class="ghost" type="button" data-close-modal>Hủy</button>
-            <button class="primary" type="submit">Lưu thay đổi</button>
+            <button class="primary" type="submit">Đổi mật khẩu</button>
           </div>
         </form>
       </section>
@@ -1159,6 +1156,7 @@
           var actions = document.createElement('td');
           var rolePill = document.createElement('span');
           var editButton = document.createElement('button');
+          var deleteButton = document.createElement('button');
 
           account.innerHTML = '<span class="user-cell"><strong></strong><span></span></span>';
           account.querySelector('strong').textContent = user.name || user.email || 'User';
@@ -1168,19 +1166,30 @@
           role.append(rolePill);
           created.textContent = formatUserDate(user.created_at);
 
-          actions.className = 'actions';
-          editButton.className = 'action-button';
+          actions.className = 'actions post-actions';
+          editButton.className = 'action-button icon-button';
           editButton.type = 'button';
-          editButton.textContent = 'Sửa vai trò';
-          // Không cho tự hạ quyền admin gốc.
-          if (user.role === 'admin') {
-            editButton.disabled = true;
-          } else {
-            editButton.addEventListener('click', function () {
-              openEditUserModal(user.id);
-            });
-          }
+          editButton.title = 'Đổi mật khẩu';
+          editButton.setAttribute('aria-label', 'Đổi mật khẩu cho ' + (user.email || 'tài khoản'));
+          editButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
+          editButton.addEventListener('click', function () {
+            openEditUserModal(user.id);
+          });
           actions.append(editButton);
+
+          // Admin can change every password, including their own, but an admin
+          // account is never offered as a deletion target.
+          if (user.role !== 'admin') {
+            deleteButton.className = 'action-button danger icon-button';
+            deleteButton.type = 'button';
+            deleteButton.title = 'Xóa người dùng';
+            deleteButton.setAttribute('aria-label', 'Xóa người dùng ' + (user.email || ''));
+            deleteButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v5M14 11v5"/></svg>';
+            deleteButton.addEventListener('click', function () {
+              deleteUserAccount(user);
+            });
+            actions.append(deleteButton);
+          }
           row.append(account, role, created, actions);
           table.append(row);
         });
@@ -1294,12 +1303,36 @@
         notice.hidden = true;
         form.reset();
         form.elements.userId.value = user.id;
-        form.elements.name.value = user.name || '';
-        form.elements.role.value = user.role === 'moderator' ? 'moderator' : 'user';
         document.getElementById('editCurrentEmail').textContent = user.email || '-';
         document.getElementById('editCreatedAt').textContent = formatUserDate(user.created_at);
         modal.hidden = false;
-        form.elements.name.focus();
+        form.elements.password.focus();
+      }
+
+      async function manageUser(payload) {
+        var result = await supabaseClient.functions.invoke('manage-user', { body: payload });
+        if (result.error) {
+          var context = result.error.context;
+          var detail = context && typeof context.json === 'function'
+            ? await context.json().catch(function () { return null; })
+            : null;
+          throw new Error(detail && detail.error ? detail.error : result.error.message);
+        }
+        if (result.data && result.data.error) throw new Error(result.data.error);
+        return result.data || {};
+      }
+
+      async function deleteUserAccount(user) {
+        if (user.role === 'admin') return;
+        var label = user.email || user.name || 'tài khoản này';
+        if (!window.confirm('Xóa vĩnh viễn ' + label + '? Thao tác này không thể hoàn tác.')) return;
+        try {
+          await manageUser({ action: 'delete', userId: user.id });
+          showNotice('Đã xóa tài khoản ' + label + '.', 'success');
+          await renderUsers();
+        } catch (error) {
+          showNotice('Không xóa được tài khoản: ' + error.message, 'error');
+        }
       }
 
       document.querySelectorAll('[data-close-modal]').forEach(function (button) {
@@ -1321,26 +1354,24 @@
         var form = event.currentTarget;
         var notice = document.getElementById('editUserNotice');
         var userId = String(form.elements.userId.value || '');
-        var name = String(form.elements.name.value || '').trim();
-        var role = form.elements.role.value === 'moderator' ? 'moderator' : 'user';
+        var password = String(form.elements.password.value || '');
+        var passwordConfirm = String(form.elements.passwordConfirm.value || '');
 
-        if (!name) {
-          showModalNotice(notice, 'Vui lòng nhập họ tên.', 'error');
+        if (password.length < 8) {
+          showModalNotice(notice, 'Mật khẩu phải có ít nhất 8 ký tự.', 'error');
           return;
         }
-
-        var res = await supabaseClient
-          .from('profiles')
-          .update({ name: name, role: role })
-          .eq('id', userId)
-          .select('id');
-        if (res.error) {
-          showModalNotice(notice, 'Không lưu được: ' + res.error.message, 'error');
+        if (password !== passwordConfirm) {
+          showModalNotice(notice, 'Hai mật khẩu chưa trùng nhau.', 'error');
           return;
         }
-
-        await renderUsers();
-        closeUserModals();
+        try {
+          await manageUser({ action: 'password', userId: userId, password: password });
+          closeUserModals();
+          showNotice('Đã đổi mật khẩu tài khoản.', 'success');
+        } catch (error) {
+          showModalNotice(notice, 'Không đổi được mật khẩu: ' + error.message, 'error');
+        }
       });
 
       document.getElementById('logoutButton').addEventListener('click', async function () {

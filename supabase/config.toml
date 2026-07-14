@@ -11,3 +11,8 @@ verify_jwt = false
 
 [functions.unsubscribe]
 verify_jwt = false
+
+# Quản trị tài khoản bắt buộc có JWT; Edge Function còn kiểm tra role admin
+# trong profiles trước khi dùng service_role đổi mật khẩu hoặc xóa user.
+[functions.manage-user]
+verify_jwt = true
