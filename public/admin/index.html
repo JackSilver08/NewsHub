@@ -125,6 +125,33 @@
         margin-top: auto;
         width: 100%;
       }
+      .header-logout {
+        width: 38px;
+        height: 38px;
+        display: inline-grid;
+        place-items: center;
+        flex: 0 0 auto;
+        padding: 0;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .header-logout:hover {
+        border-color: #fecaca;
+        background: #fff7f7;
+        color: #b91c1c;
+      }
+      .header-logout svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
       .main {
         min-width: 0;
         display: grid;
@@ -711,7 +738,6 @@
           <a href="/">Xem website</a>
           <a href="/search">Tìm bài viết</a>
         </nav>
-        <button class="logout" type="button" id="logoutButton">Đăng xuất</button>
       </aside>
 
       <main class="main">
@@ -721,6 +747,19 @@
             <span id="adminEmail">admin@newshub.com</span>
             <span class="role-badge" id="roleBadge">Admin</span>
             <span class="avatar" aria-hidden="true">A</span>
+            <button
+              class="header-logout"
+              type="button"
+              id="logoutButton"
+              title="Đăng xuất"
+              aria-label="Đăng xuất"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 17l5-5-5-5"></path>
+                <path d="M15 12H3"></path>
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              </svg>
+            </button>
           </div>
         </header>
 
